@@ -1,6 +1,18 @@
 import React from 'react';
 
-import { Form, Input, Button, Radio, InputNumber, Card, Tooltip, Icon, notification } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Radio,
+  InputNumber,
+  Card,
+  Tooltip,
+  Icon,
+  notification
+} from 'antd';
+import axios from 'axios';
+import api_url from '../../api_url';
 
 const { TextArea } = Input;
 
@@ -17,12 +29,22 @@ class TokenType extends React.Component {
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
-        notification.success({
-          message: `Saved`,
-          description:
-            'Waiting for the api integration.',
-          placement: 'topRight'
-        });
+        axios
+          .post(api_url + 'tokenTyp', values)
+          .then(res => {
+            notification.success({
+              message: `Saved`,
+              description: 'The Token Type and Details are saved.',
+              placement: 'topRight'
+            });
+          })
+          .catch(err => {
+            notification.error({
+              message: `Error`,
+              description: 'Error Saving details',
+              placement: 'topRight'
+            });
+          });
       }
     });
   };
@@ -194,7 +216,7 @@ class TokenType extends React.Component {
           )}
         </Form.Item>
         <Form.Item label='TypeOfSecurity' validateStatus='error'>
-          {getFieldDecorator('TypeOfSecurity', {
+          {getFieldDecorator('typeOfSecurity', {
             rules: [
               {
                 required: true,
