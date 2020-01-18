@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Form, Input, Button, Radio, InputNumber, Card } from 'antd';
+import { Form, Input, Button, Radio, InputNumber, Card, Tooltip, Icon, notification } from 'antd';
 
 const { TextArea } = Input;
 
@@ -17,6 +17,12 @@ class TokenType extends React.Component {
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
+        notification.success({
+          message: `Saved`,
+          description:
+            'Waiting for the api integration.',
+          placement: 'topRight'
+        });
       }
     });
   };
@@ -91,6 +97,19 @@ class TokenType extends React.Component {
     );
   };
 
+  validateTypeOfSecurity = (rule, value, callback) => {
+    if (
+      value === 'EBS' ||
+      value === 'CSA' ||
+      value === 'CSB' ||
+      value === 'CSC'
+    ) {
+      callback('Please Select Sub Menu Option!');
+    } else {
+      callback();
+    }
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
 
@@ -139,7 +158,17 @@ class TokenType extends React.Component {
             ]
           })(<InputNumber min={1} placeholder='total number of investors' />)}
         </Form.Item>
-        <Form.Item label='Lock Period' style={{ textAlign: 'left' }}>
+        <Form.Item
+          label={
+            <span>
+              Lock Period&nbsp;
+              <Tooltip title='Minimum Lock Period is 12 Months'>
+                <Icon type='question-circle-o' />
+              </Tooltip>
+            </span>
+          }
+          style={{ textAlign: 'left' }}
+        >
           {getFieldDecorator('LPInvestor', {
             rules: [
               {
@@ -170,6 +199,9 @@ class TokenType extends React.Component {
               {
                 required: true,
                 message: 'This field is required'
+              },
+              {
+                validator: this.validateTypeOfSecurity
               }
             ]
           })(
