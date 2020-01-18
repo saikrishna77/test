@@ -30,7 +30,7 @@ class TokenType extends React.Component {
       if (!err) {
         console.log('Received values of form: ', values);
         axios
-          .post(api_url + 'tokenTyp', values)
+          .post(api_url + 'tokenType', values)
           .then(res => {
             notification.success({
               message: `Saved`,
