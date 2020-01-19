@@ -2,6 +2,7 @@ import { Menu, Card } from 'antd';
 import React from 'react';
 import TokenType from '../TokenType/TokenType';
 import { Row } from 'antd';
+import Vesting from '../Vesting/Vesting';
 
 const TokenConfig = () => {
   const [current, setCurrent] = React.useState('tType');
@@ -10,8 +11,9 @@ const TokenConfig = () => {
     setCurrent(e.key);
   };
   const handleNextClick = next => {
+    console.log('called');
     setCurrent(next);
-  }
+  };
   return (
     <Card>
       <Menu onClick={handleClick} selectedKeys={[current]} mode='horizontal'>
@@ -22,14 +24,22 @@ const TokenConfig = () => {
         <Menu.Item key='capTable'>Cap Table</Menu.Item>
       </Menu>
       {current === 'tType' ? (
-        <Row  justify='center' style={{ minHeight: '100vh', paddingTop: '4%' }}>
-          <b>Define Your Token Type, Number Of Investors, Lock Period For Investors</b>
-          <div style={{paddingLeft: '20%', paddingTop: '3%'}}>
-          <TokenType />
+        <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
+          <b>
+            Define Your Token Type, Number Of Investors, Lock Period For
+            Investors
+          </b>
+          <div style={{ paddingLeft: '20%', paddingTop: '3%' }}>
+            <TokenType NextTab={handleNextClick} />
           </div>
         </Row>
       ) : current === 'vesting' ? (
-        <div>Vesting yet to be built</div>
+        <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
+          <b>Vesting Schedule</b>
+          <div style={{ marginTop: '1%' }}>
+            <Vesting NextTab={handleNextClick} />
+          </div>
+        </Row>
       ) : current === 'phase' ? (
         <div>Phase yet to be built</div>
       ) : current === 'dividend' ? (
