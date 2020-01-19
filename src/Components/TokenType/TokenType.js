@@ -2,7 +2,6 @@ import React from 'react';
 
 import {
   Form,
-  Input,
   Button,
   Radio,
   InputNumber,
@@ -14,8 +13,6 @@ import {
 import axios from 'axios';
 import api_url from '../../api_url';
 
-const { TextArea } = Input;
-
 class TokenType extends React.Component {
   state = {
     confirmDirty: false,
@@ -26,6 +23,10 @@ class TokenType extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    // this.props.form.validateFields(
+    //   ['TypeOfSecurity'],
+    //   (err, values, callback) => {}
+    // );
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
@@ -98,7 +99,7 @@ class TokenType extends React.Component {
   EquityBasedSecurities = () => {
     return (
       <Card>
-        Select one of the option for quity based securities
+        Select one of the option for Equity Based Securities
         <br />
         <Radio value={'CSA'}>Common Stock - Series A</Radio>
         <br />
@@ -160,17 +161,10 @@ class TokenType extends React.Component {
 
     return (
       <Form {...formItemLayout} onSubmit={this.handleSubmit}>
-        <Form.Item label='Description'>
-          {getFieldDecorator('description', {
-            rules: [
-              {
-                required: true,
-                message: 'This field is required!'
-              }
-            ]
-          })(<TextArea autoSize={{ minRows: 2, maxRows: 6 }} allowClear />)}
-        </Form.Item>
-        <Form.Item label='# Of Investors' style={{ textAlign: 'left' }}>
+        <Form.Item
+          label='Total Number Of Investors'
+          style={{ textAlign: 'left' }}
+        >
           {getFieldDecorator('NoOfInvestors', {
             rules: [
               {
@@ -183,7 +177,7 @@ class TokenType extends React.Component {
         <Form.Item
           label={
             <span>
-              Lock Period&nbsp;
+              Lock Period For Investor&nbsp;
               <Tooltip title='Minimum Lock Period is 12 Months'>
                 <Icon type='question-circle-o' />
               </Tooltip>
@@ -200,7 +194,17 @@ class TokenType extends React.Component {
             ]
           })(<InputNumber min={12} placeholder='lock period for investor' />)}
         </Form.Item>
-        <Form.Item label='SecurityToken' style={{ textAlign: 'left' }}>
+        <Form.Item
+          label={
+            <span style={{ whiteSpace: 'normal' }}>
+              Security Token must be&nbsp;
+              <Tooltip title='So when we say Divisible or Indivisible means "Fractional" or "Whole Number"'>
+                <Icon type='question-circle-o' />
+              </Tooltip>
+            </span>
+          }
+          style={{ textAlign: 'left' }}
+        >
           {getFieldDecorator('SecurityToken', {
             rules: [
               {
@@ -209,13 +213,17 @@ class TokenType extends React.Component {
               }
             ]
           })(
-            <Radio.Group>
+            <Radio.Group style={{ marginRight: '200px' }}>
               <Radio value={'divisible'}>Divisible</Radio>
               <Radio value={'indivisible'}>Indivisible</Radio>
             </Radio.Group>
           )}
         </Form.Item>
-        <Form.Item label='TypeOfSecurity' validateStatus='error'>
+        <Form.Item
+          label='Type Of Security'
+          validateStatus='error'
+          style={{ textAlign: 'left' }}
+        >
           {getFieldDecorator('typeOfSecurity', {
             rules: [
               {
@@ -225,7 +233,8 @@ class TokenType extends React.Component {
               {
                 validator: this.validateTypeOfSecurity
               }
-            ]
+            ],
+            validateTrigger: 'onSubmit'
           })(
             <Radio.Group
               style={{ textAlign: 'left' }}

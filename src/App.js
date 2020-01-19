@@ -6,7 +6,7 @@ import { Row } from 'antd';
 function App() {
   return (
     <div className='App'>
-      <Row style={{ padding: '0 20% 0 20%' }}>
+      <Row>
         <TokenConfig></TokenConfig>
       </Row>
     </div>

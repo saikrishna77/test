@@ -9,6 +9,9 @@ const TokenConfig = () => {
     console.log('click ', e);
     setCurrent(e.key);
   };
+  const handleNextClick = next => {
+    setCurrent(next);
+  }
   return (
     <Card>
       <Menu onClick={handleClick} selectedKeys={[current]} mode='horizontal'>
@@ -19,8 +22,11 @@ const TokenConfig = () => {
         <Menu.Item key='capTable'>Cap Table</Menu.Item>
       </Menu>
       {current === 'tType' ? (
-        <Row type='flex' justify='center' style={{ minHeight: '100vh', paddingTop: '7%' }}>
+        <Row  justify='center' style={{ minHeight: '100vh', paddingTop: '4%' }}>
+          <b>Define Your Token Type, Number Of Investors, Lock Period For Investors</b>
+          <div style={{paddingLeft: '20%', paddingTop: '3%'}}>
           <TokenType />
+          </div>
         </Row>
       ) : current === 'vesting' ? (
         <div>Vesting yet to be built</div>
