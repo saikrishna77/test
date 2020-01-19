@@ -8,7 +8,8 @@ import {
   Button,
   notification,
   Modal,
-  Tooltip
+  Tooltip,
+  Alert
 } from 'antd';
 
 const Vesting = () => {
@@ -212,16 +213,24 @@ const Vesting = () => {
         <br />
         <div style={{ textAlign: 'left' }}>
           {vestingMonths <= 0 ? (
-            <Tooltip placement='top' title={'Add number of months first'}>
-              <Button
-                onClick={handleAdd}
-                type='primary'
-                disabled={vestingMonths <= 0}
-                style={{ marginBottom: 2 }}
-              >
-                Add a row
-              </Button>
-            </Tooltip>
+            <>
+              <div style={{ margin: '2%', textAlign: 'center' }}>
+                <Alert
+                  message='Enter total duration for vesting to be able to edit '
+                  type='warning'
+                />
+              </div>
+              <Tooltip placement='top' title={'Add number of months first'}>
+                <Button
+                  onClick={handleAdd}
+                  type='primary'
+                  disabled={vestingMonths <= 0}
+                  style={{ marginBottom: 2 }}
+                >
+                  Add a row
+                </Button>
+              </Tooltip>
+            </>
           ) : (
             <Button
               onClick={handleAdd}
@@ -241,6 +250,7 @@ const Vesting = () => {
           </Button>
         </div>
         <Table
+          tableLayout='auto'
           columns={columns}
           dataSource={data}
           style={{ marginTop: '2%' }}
