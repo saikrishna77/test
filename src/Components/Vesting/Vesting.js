@@ -32,9 +32,12 @@ const Vesting = () => {
       setErrMsg('Give the vesting a name, dugh!');
       setSetError(true);
     } else if (!vestingMonths) {
-      setErrMsg(`Don't your vesting have a duration, uff!`);
+      setErrMsg(`Don't your vesting have a duration, puh-leeze!`);
       setSetError(true);
-    }else {
+    } else if (isNaN(displayVesting)) {
+      setErrMsg(`Check all the vesting percentages are entered, pooh!`);
+      setSetError(true);
+    } else {
       notification.info({
         message: `Pending`,
         description: 'Integration and verification pending',
@@ -62,12 +65,16 @@ const Vesting = () => {
     setDisplayVesting(100);
   };
 
-  const onChangeEOD = record => {
-    console.log(record);
+  const onChangeEOD = (value, record) => {
+    let tempData = [...data];
+    tempData[record.key - 1].EOD = value;
+    setData(tempData);
   };
 
-  const onChangeFD = record => {
-    console.log(record);
+  const onChangeFD = (value, record) => {
+    let tempData = [...data];
+    tempData[record.key - 1].FD = value;
+    setData(tempData);
   };
 
   const onChangeVestPres = (e, record) => {
@@ -132,12 +139,7 @@ const Vesting = () => {
             placeholder='Select a person'
             optionFilterProp='children'
             value={text}
-            onChange={() => onChangeFD(record)}
-            filterOption={(input, option) =>
-              option.props.children
-                .toLowerCase()
-                .indexOf(input.toLowerCase()) >= 0
-            }
+            onChange={e => onChangeFD(e, record)}
           >
             <Select.Option value='Fixed'>Fixed</Select.Option>
             <Select.Option value='DivideEqually'>Divide Equally</Select.Option>
@@ -150,8 +152,26 @@ const Vesting = () => {
       dataIndex: 'EOD',
       key: 'EOD',
       render: (text, record) => {
+        let start = 1,
+          min = 1;
+        if (record.key === 1) {
+          start = 1;
+          min = 1;
+        } else {
+          start = data[record.key - 2].EOD;
+          min = start + 1;
+        }
         return (
-          <InputNumber onChange={() => onChangeEOD(record)} value={text} />
+          <>
+            {record.FD === 'DivideEqually' ? <>{start} - &ensp;</> : null}
+            <InputNumber
+              min={min}
+              max={vestingMonths}
+              onChange={e => onChangeEOD(e, record)}
+              style={{ width: '60px' }}
+              value={text}
+            />
+          </>
         );
       }
     },
@@ -161,7 +181,11 @@ const Vesting = () => {
       dataIndex: 'vestPers',
       render: (text, record) => {
         return (
-          <InputNumber onBlur={e => onChangeVestPres(e, record)} value={text} />
+          <InputNumber
+            min={1}
+            onBlur={e => onChangeVestPres(e, record)}
+            value={text}
+          />
         );
       }
     },
@@ -204,7 +228,7 @@ const Vesting = () => {
   return (
     <div>
       {setError ? DisplayError() : null}
-      <b>Enter the Name for Vesting Schedule</b>
+      <b>* Enter the Name for Vesting Schedule</b>
       <br />
       <Input
         placeholder='name'
@@ -214,7 +238,7 @@ const Vesting = () => {
         style={{ width: '40%', textAlign: 'center' }}
       />
       <Card style={{ marginTop: '2%' }}>
-        <b>Enter Total Duration for Vesting:</b>{' '}
+        <b>* Enter Total Duration for Vesting:</b>{' '}
         <InputNumber placeholder='months' onChange={onChangeMonths} />
         <br />
         <div style={{ textAlign: 'left' }}>
