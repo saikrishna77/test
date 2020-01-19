@@ -12,37 +12,28 @@ import {
 } from 'antd';
 
 const Vesting = () => {
-  const dataStruct = [
-    {
-      key: 1,
-      name: '1st Vesting',
-      FD: 'DivideEqually',
-      EOD: 0,
-      vestPers: 0,
-      LockPeriod: 0
-    }
-  ];
-
   const [data, setData] = React.useState([]);
   const [setError, setSetError] = React.useState(false);
   const [vestingName, setVestingName] = React.useState();
   const [vestingMonths, setVestingMonths] = React.useState(0);
   const [totalVesting, setTotalVesting] = React.useState(0);
-  let errMsg;
+  const [displayVesting, setDisplayVesting] = React.useState(0);
+  const [errMsg, setErrMsg] = React.useState('');
 
   const onSubmit = () => {
-    if (totalVesting > 100) {
-      errMsg = 'The total vesting value extended 100%';
+    if (displayVesting > 100) {
+      setErrMsg('The total vesting value extended 100%');
       setSetError(true);
-    } else if (totalVesting < 100) {
+    } else if (displayVesting < 100) {
+      setErrMsg('The toal vesting value is below 100%');
       setSetError(true);
-      errMsg = 'The toal vesting value is below 100%';
+    } else {
+      notification.info({
+        message: `Pending`,
+        description: 'Integration and verification pending',
+        placement: 'topRight'
+      });
     }
-    notification.info({
-      message: `Pending`,
-      description: 'Integration and verification pending',
-      placement: 'topRight'
-    });
   };
 
   const onChangeMonths = value => {
@@ -61,6 +52,7 @@ const Vesting = () => {
     else setData([]);
     setVestingMonths(value);
     setTotalVesting(100);
+    setDisplayVesting(100);
   };
 
   const onChangeEOD = record => {
@@ -71,35 +63,30 @@ const Vesting = () => {
     console.log(record);
   };
 
-  const calculateTotalPres = () => {
-    let tempData = data;
-    let totalPers;
-    tempData.forEach(ele => {
-      totalPers += parseFloat(ele.vestPers);
-    });
-    return totalPers;
-  };
-
   const onChangeVestPres = (e, record) => {
     let tempData = data;
     tempData[record.key - 1].vestPers = e.target.value;
-    let totalPers = 0;
+    let totalPers = 0,
+      tempVar = 0;
     tempData.forEach(ele => {
       totalPers += parseFloat(ele.vestPers);
     });
+    tempVar = totalPers;
     if (totalPers < 100) {
       const newData = {
         key: data.length + 1,
-        name: `${data.length + 1}th Vesting`,
+        name: `${data.length + 1} Vesting`,
         FD: 'DivideEqually',
         EOD: 0,
         vestPers: 100 - totalPers,
         LockPeriod: 0
       };
+      tempVar += 100 - totalPers;
       tempData.push(newData);
     }
     setData(tempData);
     setTotalVesting(totalPers);
+    setDisplayVesting(tempVar);
   };
 
   const onChangeLockPeriod = record => {
@@ -189,7 +176,7 @@ const Vesting = () => {
   const handleAdd = () => {
     const newData = {
       key: data.length + 1,
-      name: `${data.length + 1}th Vesting`,
+      name: `${data.length + 1} Vesting`,
       FD: 'DivideEqually',
       EOD: 0,
       vestPers: 0,
@@ -202,7 +189,8 @@ const Vesting = () => {
 
   const handleDelete = () => {
     let tempData = [...data];
-    tempData.pop();
+    const x = tempData.pop();
+    setDisplayVesting(displayVesting - x.vestPers);
     setData(tempData);
   };
 
@@ -259,7 +247,7 @@ const Vesting = () => {
           pagination={false}
         />
         <div style={{ marginTop: '20px' }}>
-          <b>Total Percent Vesting: {totalVesting}%</b>
+          <b>Total Percent Vesting: {displayVesting}%</b>
         </div>
         <div style={{ textAlign: 'right' }}>
           <Button type='primary' onClick={onSubmit}>
