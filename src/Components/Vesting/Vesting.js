@@ -28,7 +28,13 @@ const Vesting = () => {
     } else if (displayVesting < 100) {
       setErrMsg('The toal vesting value is below 100%');
       setSetError(true);
-    } else {
+    } else if (!vestingName) {
+      setErrMsg('Give the vesting a name, dugh!');
+      setSetError(true);
+    } else if (!vestingMonths) {
+      setErrMsg(`Don't your vesting have a duration, uff!`);
+      setSetError(true);
+    }else {
       notification.info({
         message: `Pending`,
         description: 'Integration and verification pending',
