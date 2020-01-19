@@ -239,7 +239,7 @@ const Vesting = () => {
       />
       <Card style={{ marginTop: '2%' }}>
         <b>* Enter Total Duration for Vesting:</b>{' '}
-        <InputNumber placeholder='months' onChange={onChangeMonths} />
+        <InputNumber placeholder='months' onChange={onChangeMonths} /> Months
         <br />
         <div style={{ textAlign: 'left' }}>
           {vestingMonths <= 0 ? (
