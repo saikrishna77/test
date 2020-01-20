@@ -13,7 +13,7 @@ import {
 } from 'antd';
 
 const Vesting = props => {
-  console.log(props.TokenID);
+  // console.log(props.TokenID);
   const [data, setData] = React.useState([]);
   const [setError, setSetError] = React.useState(false);
   const [vestingName, setVestingName] = React.useState();
@@ -34,20 +34,26 @@ const Vesting = props => {
       setErrMsg(`Theres a zero in the vesting percentage, pooh!`);
       setSetError(true);
     } else if (displayVesting > 100) {
-      setErrMsg('The total vesting value extended 100%');
+      setErrMsg('The total vesting value extended 100%, puh-leeze check nah!');
       setSetError(true);
     } else if (displayVesting < 100) {
-      setErrMsg('The toal vesting value is below 100%');
+      setErrMsg('The toal vesting value is below 100%, puh-leeze check nah!');
       setSetError(true);
     } else if (!vestingName) {
       setErrMsg('Give the vesting a name, dugh!');
       setSetError(true);
     } else if (!vestingMonths) {
-      setErrMsg(`Don't your vesting have a duration, puh-leeze!`);
+      setErrMsg(`Don't your vesting have a duration, dugh!`);
       setSetError(true);
     } else if (isNaN(displayVesting)) {
-      setErrMsg(`Check all the vesting percentages are entered, pooh!`);
+      setErrMsg(
+        `Check all the vesting percentages are entered, puh-leeze check nah!`
+      );
       setSetError(true);
+    } else if (data[data.length - 1].EOD !== vestingMonths) {
+      setErrMsg(
+        'theres something wrong with the total end of vesting month, puh-leeze check nah!'
+      );
     } else {
       setSetNextModal(true);
       // notification.info({
@@ -69,7 +75,7 @@ const Vesting = props => {
         LockPeriod: 0
       }
     ];
-    tempData[0].EOD = value;
+    tempData[0].EOD = parseInt(value);
     if (value) setData(tempData);
     else setData([]);
     setVestingMonths(value);
@@ -79,20 +85,23 @@ const Vesting = props => {
 
   const onChangeEOD = (e, record) => {
     let tempData = [...data];
-    tempData[record.key - 1].EOD = e.target.value;
+    tempData[record.key - 1].EOD = parseInt(e.target.value);
     if (e.target.value < vestingMonths) {
       const newData = {
         key: data.length + 1,
         name: `${data.length + 1} Vesting`,
         FD: 'DivideEqually',
-        EOD: vestingMonths,
+        EOD: parseInt(vestingMonths),
         vestPers: 0,
         LockPeriod: 0
       };
       tempData.push(newData);
     }
     if (
-      tempData[tempData.length - 1].EOD === tempData[tempData.length - 2].EOD
+      tempData[tempData.length - 1] &&
+      tempData[tempData.length - 2] &&
+      parseInt(tempData[tempData.length - 1].EOD) ===
+        parseInt(tempData[tempData.length - 2].EOD)
     ) {
       tempData.pop();
     }
@@ -101,14 +110,14 @@ const Vesting = props => {
 
   const onChangeFD = (value, record) => {
     let tempData = [...data];
-    tempData[record.key - 1].FD = value;
+    tempData[record.key - 1].FD = parseInt(value);
     setData(tempData);
   };
 
   const onChangeVestPres = (e, record) => {
     let tempData = data;
     let zeroFlag = false;
-    tempData[record.key - 1].vestPers = e.target.value;
+    tempData[record.key - 1].vestPers = parseInt(e.target.value);
     let totalPers = 0,
       tempVar = 0;
     tempData.forEach(ele => {
@@ -122,7 +131,7 @@ const Vesting = props => {
         name: `${data.length + 1} Vesting`,
         FD: 'DivideEqually',
         EOD: 0,
-        vestPers: 100 - totalPers,
+        vestPers: parseInt(100 - totalPers),
         LockPeriod: 0
       };
       tempVar += 100 - totalPers;
@@ -135,7 +144,7 @@ const Vesting = props => {
 
   const onChangeLockPeriod = (value, record) => {
     let tempData = [...data];
-    tempData[record.key - 1].LockPeriod = value;
+    tempData[record.key - 1].LockPeriod = parseInt(value);
     setData(tempData);
   };
 
