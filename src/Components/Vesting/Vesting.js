@@ -22,6 +22,7 @@ const Vesting = props => {
   const [displayVesting, setDisplayVesting] = React.useState();
   const [errMsg, setErrMsg] = React.useState('');
   const [setNextModal, setSetNextModal] = React.useState(false);
+  const [scheduleNames, setScheduleNames] = React.useState([]);
 
   const onSubmit = () => {
     let flag = false;
@@ -30,7 +31,16 @@ const Vesting = props => {
         flag = true;
       }
     });
-    if (flag) {
+    let nameFlag = false;
+    for (let i = 0; i < scheduleNames.length; i++) {
+      if (scheduleNames[i].toString() === vestingName.toString()) {
+        nameFlag = true;
+      }
+    }
+    if (nameFlag) {
+      setErrMsg(`Dont use the same vesting name twice bro!`);
+      setSetError(true);
+    } else if (flag) {
       setErrMsg(`Theres a zero in the vesting percentage, pooh!`);
       setSetError(true);
     } else if (displayVesting > 100) {
@@ -149,6 +159,9 @@ const Vesting = props => {
   };
 
   const clearToAddNewVest = () => {
+    let temp = scheduleNames;
+    temp.push(vestingName.toString());
+    setScheduleNames(temp);
     setTotalVesting();
     setDisplayVesting();
     setVestingMonths();
@@ -368,6 +381,21 @@ const Vesting = props => {
           <Button type='primary' onClick={onSubmit}>
             Save the Vesting Schedule
           </Button>
+          {scheduleNames.length > 0 ? (
+            <Button
+              type='primary'
+              onClick={props.NextTab('phase')}
+              style={{ marginLeft: '30px' }}
+            >
+              Next
+            </Button>
+          ) : (
+            <Tooltip title='Add atleast one to go to next page'>
+              <Button type='primary' disabled style={{ marginLeft: '30px' }}>
+                Next
+              </Button>
+            </Tooltip>
+          )}
         </div>
       </Card>
     </div>
