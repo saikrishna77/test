@@ -11,6 +11,8 @@ import {
   Tooltip,
   Alert
 } from 'antd';
+import axios from 'axios';
+import api_url from '../../api_url';
 
 const Vesting = props => {
   // console.log(props.TokenID);
@@ -23,6 +25,7 @@ const Vesting = props => {
   const [errMsg, setErrMsg] = React.useState('');
   const [setNextModal, setSetNextModal] = React.useState(false);
   const [scheduleNames, setScheduleNames] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
   const onSubmit = () => {
     let flag = false;
@@ -66,11 +69,6 @@ const Vesting = props => {
       );
     } else {
       setSetNextModal(true);
-      // notification.info({
-      //   message: `Pending`,
-      //   description: 'Integration and verification pending',
-      //   placement: 'topRight'
-      // });
     }
   };
 
@@ -120,7 +118,7 @@ const Vesting = props => {
 
   const onChangeFD = (value, record) => {
     let tempData = [...data];
-    tempData[record.key - 1].FD = parseInt(value);
+    tempData[record.key - 1].FD = value;
     setData(tempData);
   };
 
@@ -177,15 +175,66 @@ const Vesting = props => {
         'Vesting schedule saved & Now you can choose to add another vesting schedule or you can go to the next section',
       okText: 'Next',
       cancelText: 'Add',
+      okButtonProps: { loading: loading },
+      cancelButtonProps: { loading: loading },
       onOk() {
         setSetNextModal(false);
-        props.NextTab('phase');
-        console.log('Next');
+        setLoading(true);
+        const payload = {
+          totalVestingMonths: vestingMonths,
+          vestingName: vestingName.toString().replace(/ +/g, ''),
+          firebaseTokenID: props.TokenID,
+          data: data
+        };
+        axios
+          .post(api_url + 'vestingSchedule', payload)
+          .then(res => {
+            notification.success({
+              message: `Vesting Schedule Added`,
+              description: `Your vesting schedule with name ${vestingName} has been saved`,
+              placement: 'topRight'
+            });
+            setLoading(false);
+            props.NextTab('phase');
+          })
+          .catch(err => {
+            notification.error({
+              message: 'saving failed',
+              description: `Problem saving ${vestingName}`,
+              placement: 'topRight'
+            });
+            setLoading(false);
+          });
       },
       onCancel() {
+        setLoading(true);
         console.log(data);
         console.log('vestingMonths: ' + vestingMonths);
         console.log('vestingName: ' + vestingName);
+        const payload = {
+          totalVestingMonths: vestingMonths,
+          vestingName: vestingName.toString().replace(/ +/g, ''),
+          firebaseTokenID: props.TokenID,
+          data: data
+        };
+        axios
+          .post(api_url + 'vestingSchedule', payload)
+          .then(res => {
+            notification.success({
+              message: `Vesting Schedule Added`,
+              description: `Your vesting schedule with name ${vestingName} has been saved`,
+              placement: 'topRight'
+            });
+            setLoading(false);
+          })
+          .catch(err => {
+            notification.error({
+              message: 'saving failed',
+              description: `Problem saving ${vestingName}`,
+              placement: 'topRight'
+            });
+            setLoading(false);
+          });
         clearToAddNewVest();
         console.log('Add');
       }
@@ -306,6 +355,10 @@ const Vesting = props => {
     setData(tempData);
   };
 
+  const handleNextPhase = () => {
+    props.NextTab('phase');
+  };
+
   return (
     <div>
       {setError ? DisplayError() : null}
@@ -378,13 +431,13 @@ const Vesting = props => {
           <b>Total Percent Vesting: {displayVesting}%</b>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <Button type='primary' onClick={onSubmit}>
+          <Button type='primary' onClick={onSubmit} loading={loading}>
             Save the Vesting Schedule
           </Button>
           {scheduleNames.length > 0 ? (
             <Button
               type='primary'
-              onClick={props.NextTab('phase')}
+              onClick={handleNextPhase}
               style={{ marginLeft: '30px' }}
             >
               Next

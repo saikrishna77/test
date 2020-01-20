@@ -6,14 +6,14 @@ import Vesting from '../Vesting/Vesting';
 
 const TokenConfig = () => {
   const [current, setCurrent] = React.useState('tType');
-  const [TokenID, setTokenID] = React.useState();
+  const [firebaseTokenID, setFirebaseTokenID] = React.useState();
   const handleClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
   };
   const handleNextClick = (next, tokenID = null) => {
     if (tokenID) {
-      setTokenID(tokenID);
+      setFirebaseTokenID(tokenID);
     }
     console.log('called');
     setCurrent(next);
@@ -55,7 +55,7 @@ const TokenConfig = () => {
         <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
           <b>Vesting Schedule</b>
           <div style={{ marginTop: '1%' }}>
-            <Vesting NextTab={handleNextClick} TokenID={TokenID} />
+            <Vesting NextTab={handleNextClick} TokenID={firebaseTokenID} />
           </div>
         </Row>
       ) : current === 'phase' ? (
