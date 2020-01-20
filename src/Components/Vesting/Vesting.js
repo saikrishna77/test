@@ -24,6 +24,16 @@ const Vesting = props => {
   const [setNextModal, setSetNextModal] = React.useState(false);
 
   const onSubmit = () => {
+    let flag = false;
+    data.forEach(e => {
+      if(parseInt(e.vestPers) === 0) {
+        flag = true;
+      }
+    })
+    if(flag) {
+      setErrMsg(`Theres a zero in the vesting percentage, pooh!`);
+      setSetError(true);
+    }
     if (displayVesting > 100) {
       setErrMsg('The total vesting value extended 100%');
       setSetError(true);
@@ -152,6 +162,9 @@ const Vesting = props => {
         console.log('Next');
       },
       onCancel() {
+        console.log(data);
+        console.log('vestingMonths: ' + vestingMonths);
+        console.log('vestingName: ' + vestingName);
         clearToAddNewVest();
         console.log('Add');
       }
