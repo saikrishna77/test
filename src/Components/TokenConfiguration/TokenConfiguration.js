@@ -6,11 +6,15 @@ import Vesting from '../Vesting/Vesting';
 
 const TokenConfig = () => {
   const [current, setCurrent] = React.useState('tType');
+  const [TokenID, setTokenID] = React.useState();
   const handleClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
   };
-  const handleNextClick = next => {
+  const handleNextClick = (next, tokenID = null) => {
+    if (tokenID) {
+      setTokenID(tokenID);
+    }
     console.log('called');
     setCurrent(next);
   };
@@ -51,7 +55,7 @@ const TokenConfig = () => {
         <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
           <b>Vesting Schedule</b>
           <div style={{ marginTop: '1%' }}>
-            <Vesting NextTab={handleNextClick} />
+            <Vesting NextTab={handleNextClick} TokenID={TokenID} />
           </div>
         </Row>
       ) : current === 'phase' ? (

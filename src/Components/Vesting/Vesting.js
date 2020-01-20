@@ -13,6 +13,7 @@ import {
 } from 'antd';
 
 const Vesting = props => {
+  console.log(props.TokenID);
   const [data, setData] = React.useState([]);
   const [setError, setSetError] = React.useState(false);
   const [vestingName, setVestingName] = React.useState();
