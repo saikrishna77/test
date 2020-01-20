@@ -67,9 +67,25 @@ const Vesting = props => {
     setDisplayVesting(100);
   };
 
-  const onChangeEOD = (value, record) => {
+  const onChangeEOD = (e, record) => {
     let tempData = [...data];
-    tempData[record.key - 1].EOD = value;
+    tempData[record.key - 1].EOD = e.target.value;
+    if (e.target.value < vestingMonths) {
+      const newData = {
+        key: data.length + 1,
+        name: `${data.length + 1} Vesting`,
+        FD: 'DivideEqually',
+        EOD: vestingMonths,
+        vestPers: 0,
+        LockPeriod: 0
+      };
+      tempData.push(newData);
+    }
+    if (
+      tempData[tempData.length - 1].EOD === tempData[tempData.length - 2].EOD
+    ) {
+      tempData.pop();
+    }
     setData(tempData);
   };
 
@@ -193,15 +209,15 @@ const Vesting = props => {
           min = 1;
         } else {
           start = data[record.key - 2].EOD;
-          min = start + 1;
+          min = parseInt(start) + 1;
         }
         return (
           <>
             {record.FD === 'DivideEqually' ? <>{start} - &ensp;</> : null}
             <InputNumber
-              min={min}
+              min={parseInt(min)}
               max={vestingMonths}
-              onChange={e => onChangeEOD(e, record)}
+              onBlur={e => onChangeEOD(e, record)}
               style={{ width: '60px' }}
               value={text}
             />

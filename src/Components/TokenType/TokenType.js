@@ -18,15 +18,17 @@ class TokenType extends React.Component {
     confirmDirty: false,
     autoCompleteResult: [],
     EBS: false,
-    EBSTYPE: null
+    EBSTYPE: null,
+    SetLoading: false
   };
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault();
     // this.props.form.validateFields(
     //   ['TypeOfSecurity'],
     //   (err, values, callback) => {}
     // );
+    this.setState({ SetLoading: true });
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
@@ -47,6 +49,7 @@ class TokenType extends React.Component {
               placement: 'topRight'
             });
           });
+        this.setState({ SetLoading: false });
       }
     });
   };
@@ -260,7 +263,11 @@ class TokenType extends React.Component {
           )}
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
-          <Button type='primary' htmlType='submit'>
+          <Button
+            type='primary'
+            htmlType='submit'
+            loading={this.state.SetLoading}
+          >
             Save My Token Type & Token Details
           </Button>
         </Form.Item>

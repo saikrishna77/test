@@ -1,11 +1,11 @@
 import { Menu, Card } from 'antd';
 import React from 'react';
 import TokenType from '../TokenType/TokenType';
-import { Row } from 'antd';
+import { Row, Icon } from 'antd';
 import Vesting from '../Vesting/Vesting';
 
 const TokenConfig = () => {
-  const [current, setCurrent] = React.useState('tType');
+  const [current, setCurrent] = React.useState('vesting');
   const handleClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
@@ -17,11 +17,25 @@ const TokenConfig = () => {
   return (
     <Card>
       <Menu onClick={handleClick} selectedKeys={[current]} mode='horizontal'>
-        <Menu.Item key='tType'>Token Type and Details</Menu.Item>
-        <Menu.Item key='vesting'>Vesting Schedule & lock period</Menu.Item>
-        <Menu.Item key='phase'>Phase</Menu.Item>
-        <Menu.Item key='dividend'>Dividend</Menu.Item>
-        <Menu.Item key='capTable'>Cap Table</Menu.Item>
+        <Menu.Item key='tType' disabled={current !== 'tType'}>
+          Token Type and Details &nbsp;
+          <Icon type='right' />
+        </Menu.Item>
+        <Menu.Item key='vesting' disabled={current !== 'vesting'}>
+          Vesting Schedule & lock period &nbsp;
+          <Icon type='right' />
+        </Menu.Item>
+        <Menu.Item key='phase' disabled={current !== 'phase'}>
+          Phase &nbsp;
+          <Icon type='right' />
+        </Menu.Item>
+        <Menu.Item key='dividend' disabled={current !== 'dividend'}>
+          Dividend &nbsp;
+          <Icon type='right' />
+        </Menu.Item>
+        <Menu.Item key='capTable' disabled={current !== 'capTable'}>
+          Cap Table &nbsp;
+        </Menu.Item>
       </Menu>
       {current === 'tType' ? (
         <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
