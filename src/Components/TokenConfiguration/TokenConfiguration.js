@@ -5,7 +5,7 @@ import { Row, Icon } from 'antd';
 import Vesting from '../Vesting/Vesting';
 
 const TokenConfig = () => {
-  const [current, setCurrent] = React.useState('vesting');
+  const [current, setCurrent] = React.useState('tType');
   const handleClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
