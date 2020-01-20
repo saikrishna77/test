@@ -26,15 +26,14 @@ const Vesting = props => {
   const onSubmit = () => {
     let flag = false;
     data.forEach(e => {
-      if(parseInt(e.vestPers) === 0) {
+      if (parseInt(e.vestPers) === 0) {
         flag = true;
       }
-    })
-    if(flag) {
+    });
+    if (flag) {
       setErrMsg(`Theres a zero in the vesting percentage, pooh!`);
       setSetError(true);
-    }
-    if (displayVesting > 100) {
+    } else if (displayVesting > 100) {
       setErrMsg('The total vesting value extended 100%');
       setSetError(true);
     } else if (displayVesting < 100) {
