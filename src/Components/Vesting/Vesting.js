@@ -12,14 +12,15 @@ import {
   Alert
 } from 'antd';
 
-const Vesting = () => {
+const Vesting = props => {
   const [data, setData] = React.useState([]);
   const [setError, setSetError] = React.useState(false);
   const [vestingName, setVestingName] = React.useState();
-  const [vestingMonths, setVestingMonths] = React.useState(0);
-  const [totalVesting, setTotalVesting] = React.useState(0);
-  const [displayVesting, setDisplayVesting] = React.useState(0);
+  const [vestingMonths, setVestingMonths] = React.useState();
+  const [totalVesting, setTotalVesting] = React.useState();
+  const [displayVesting, setDisplayVesting] = React.useState();
   const [errMsg, setErrMsg] = React.useState('');
+  const [setNextModal, setSetNextModal] = React.useState(false);
 
   const onSubmit = () => {
     if (displayVesting > 100) {
@@ -38,11 +39,12 @@ const Vesting = () => {
       setErrMsg(`Check all the vesting percentages are entered, pooh!`);
       setSetError(true);
     } else {
-      notification.info({
-        message: `Pending`,
-        description: 'Integration and verification pending',
-        placement: 'topRight'
-      });
+      setSetNextModal(true);
+      // notification.info({
+      //   message: `Pending`,
+      //   description: 'Integration and verification pending',
+      //   placement: 'topRight'
+      // });
     }
   };
 
@@ -79,14 +81,16 @@ const Vesting = () => {
 
   const onChangeVestPres = (e, record) => {
     let tempData = data;
+    let zeroFlag = false;
     tempData[record.key - 1].vestPers = e.target.value;
     let totalPers = 0,
       tempVar = 0;
     tempData.forEach(ele => {
+      if (ele.vestPers <= 0 || isNaN(ele.vestPers)) zeroFlag = true;
       totalPers += parseFloat(ele.vestPers);
     });
     tempVar = totalPers;
-    if (totalPers < 100) {
+    if (totalPers < 100 && !zeroFlag) {
       const newData = {
         key: data.length + 1,
         name: `${data.length + 1} Vesting`,
@@ -103,8 +107,38 @@ const Vesting = () => {
     setDisplayVesting(tempVar);
   };
 
-  const onChangeLockPeriod = record => {
-    console.log(record);
+  const onChangeLockPeriod = (value, record) => {
+    let tempData = [...data];
+    tempData[record.key - 1].LockPeriod = value;
+    setData(tempData);
+  };
+
+  const clearToAddNewVest = () => {
+    setTotalVesting();
+    setDisplayVesting();
+    setVestingMonths();
+    setVestingName();
+    setData([]);
+    setSetNextModal(false);
+  };
+
+  const DisplaySuccess = () => {
+    Modal.confirm({
+      title: 'Add another vesting schedule?',
+      content:
+        'Vesting schedule saved & Now you can choose to add another vesting schedule or you can go to the next section',
+      okText: 'Next',
+      cancelText: 'Add',
+      onOk() {
+        setSetNextModal(false);
+        props.NextTab('phase');
+        console.log('Next');
+      },
+      onCancel() {
+        clearToAddNewVest();
+        console.log('Add');
+      }
+    });
   };
 
   const DisplayError = () => {
@@ -181,11 +215,7 @@ const Vesting = () => {
       dataIndex: 'vestPers',
       render: (text, record) => {
         return (
-          <InputNumber
-            min={1}
-            onBlur={e => onChangeVestPres(e, record)}
-            value={text}
-          />
+          <InputNumber onBlur={e => onChangeVestPres(e, record)} value={text} />
         );
       }
     },
@@ -228,10 +258,12 @@ const Vesting = () => {
   return (
     <div>
       {setError ? DisplayError() : null}
+      {setNextModal ? DisplaySuccess() : null}
       <b>* Enter the Name for Vesting Schedule</b>
       <br />
       <Input
         placeholder='name'
+        value={vestingName}
         onChange={e => {
           setVestingName(e.target.value);
         }}
@@ -239,7 +271,12 @@ const Vesting = () => {
       />
       <Card style={{ marginTop: '2%' }}>
         <b>* Enter Total Duration for Vesting:</b>{' '}
-        <InputNumber placeholder='months' onChange={onChangeMonths} /> Months
+        <InputNumber
+          placeholder='months'
+          value={vestingMonths}
+          onChange={onChangeMonths}
+        />{' '}
+        Months
         <br />
         <div style={{ textAlign: 'left' }}>
           {vestingMonths <= 0 ? (
