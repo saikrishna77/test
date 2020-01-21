@@ -29,8 +29,20 @@ class TokenType extends React.Component {
     //   (err, values, callback) => {}
     // );
     this.props.form.validateFieldsAndScroll(async (err, values) => {
+      console.log(values);
       if (!err) {
         this.setState({ SetLoading: true });
+        if (values.typeOfSecurity === 'EBS') {
+          if (
+            values.typeOfSecuritysub === 'CSA' ||
+            values.typeOfSecuritysub === 'CSB' ||
+            values.typeOfSecuritysub === 'CSC'
+          ) {
+            values.typeOfSecurity = values.typeOfSecuritysubsub;
+          } else {
+            values.typeOfSecurity = values.typeOfSecuritysub;
+          }
+        }
         try {
           let res = await axios.post(api_url + 'tokenType', values);
           notification.success({
@@ -86,39 +98,70 @@ class TokenType extends React.Component {
   };
 
   VotingRights = type => {
+    const { getFieldDecorator } = this.props.form;
     return (
-      <Card>
+      <div style={{ marginLeft: '20px', marginTop: '10px' }}>
         Voting Rights for Common Stock Equity Based Security
-        <br />
-        <Radio value={`${type}Y`}>Yes</Radio>
-        <br />
-        <Radio value={`${type}N`}>No</Radio>
-        <br />
-      </Card>
+        <Form.Item style={{ textAlign: 'left', marginTop: '-10px' }}>
+          {getFieldDecorator(`typeOfSecuritysubsub`, {
+            rules: [
+              {
+                required: true,
+                message: 'This field is required'
+              }
+            ]
+          })(
+            <Radio.Group
+              style={{ textAlign: 'left' }}
+              onChange={this.onChangeTS}
+            >
+              <Radio value={`${type}Y`}>Yes</Radio>
+              <Radio value={`${type}N`}>No</Radio>
+            </Radio.Group>
+          )}
+        </Form.Item>
+      </div>
     );
   };
 
   EquityBasedSecurities = () => {
+    const { getFieldDecorator } = this.props.form;
     return (
-      <Card>
+      <div style={{ marginLeft: '10px', marginTop: '10px' }}>
         Select one of the option for Equity Based Securities
-        <br />
-        <Radio value={'CSA'}>Common Stock - Series A</Radio>
-        <br />
-        {this.state.EBSTYPE === 'CSA' ? this.VotingRights('CSA') : null}
-        <Radio value={'CSB'}>Common Stock - Series B</Radio>
-        <br />
-        {this.state.EBSTYPE === 'CSB' ? this.VotingRights('CSB') : null}
-        <Radio value={'CSC'}>Common Stock - Series C</Radio>
-        <br />
-        {this.state.EBSTYPE === 'CSC' ? this.VotingRights('CSC') : null}
-        <Radio value={'PSA'}>Preferred Stock - Series A</Radio>
-        <br />
-        <Radio value={'PSB'}>Preferred Stock - Series B</Radio>
-        <br />
-        <Radio value={'PSC'}>Preferred Stock - Series C</Radio>
-        <br />
-      </Card>
+        <Form.Item style={{ textAlign: 'left', marginTop: '-10px' }}>
+          {getFieldDecorator(`typeOfSecuritysub`, {
+            rules: [
+              {
+                required: true,
+                message: 'This field is required'
+              }
+            ]
+          })(
+            <Radio.Group
+              style={{ textAlign: 'left' }}
+              onChange={this.onChangeTS}
+            >
+              <br />
+              <Radio value={'CSA'}>Common Stock - Series A</Radio>
+              <br />
+              {this.state.EBSTYPE === 'CSA' ? this.VotingRights('CSA') : null}
+              <Radio value={'CSB'}>Common Stock - Series B</Radio>
+              <br />
+              {this.state.EBSTYPE === 'CSB' ? this.VotingRights('CSB') : null}
+              <Radio value={'CSC'}>Common Stock - Series C</Radio>
+              <br />
+              {this.state.EBSTYPE === 'CSC' ? this.VotingRights('CSC') : null}
+              <Radio value={'PSA'}>Preferred Stock - Series A</Radio>
+              <br />
+              <Radio value={'PSB'}>Preferred Stock - Series B</Radio>
+              <br />
+              <Radio value={'PSC'}>Preferred Stock - Series C</Radio>
+              <br />
+            </Radio.Group>
+          )}
+        </Form.Item>
+      </div>
     );
   };
 
@@ -231,12 +274,8 @@ class TokenType extends React.Component {
               {
                 required: true,
                 message: 'This field is required'
-              },
-              {
-                validator: this.validateTypeOfSecurity
               }
-            ],
-            validateTrigger: 'onSubmit'
+            ]
           })(
             <Radio.Group
               style={{ textAlign: 'left' }}
