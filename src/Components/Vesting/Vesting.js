@@ -9,7 +9,8 @@ import {
   notification,
   Modal,
   Tooltip,
-  Alert
+  Alert,
+  Popconfirm
 } from 'antd';
 import axios from 'axios';
 import api_url from '../../api_url';
@@ -29,9 +30,13 @@ const Vesting = props => {
 
   const onSubmit = () => {
     let flag = false;
+    let lockFlag = false;
     data.forEach(e => {
       if (parseInt(e.vestPers) === 0) {
         flag = true;
+      }
+      if (parseInt(e.LockPeriod) <= 0) {
+        lockFlag = true;
       }
     });
     let nameFlag = false;
@@ -40,7 +45,13 @@ const Vesting = props => {
         nameFlag = true;
       }
     }
-    if (nameFlag) {
+    if (data.length <= 0) {
+      setErrMsg(`NO data to save bro`);
+      setSetError(true);
+    } else if (lockFlag) {
+      setErrMsg(`check the lock period for all entries.`);
+      setSetError(true);
+    } else if (nameFlag) {
       setErrMsg(`Dont use the same vesting name twice bro!`);
       setSetError(true);
     } else if (flag) {
@@ -67,9 +78,16 @@ const Vesting = props => {
       setErrMsg(
         'theres something wrong with the total end of vesting month, puh-leeze check nah!'
       );
+      setSetError(true);
     } else {
       setSetNextModal(true);
     }
+  };
+
+  const handleDeleteRow = key => {
+    let tempdata = [...data];
+    setDisplayVesting(displayVesting - tempdata[key - 1].vestPers);
+    setData(tempdata.filter(item => item.key !== key));
   };
 
   const onChangeMonths = value => {
@@ -100,7 +118,7 @@ const Vesting = props => {
         name: `${data.length + 1} Vesting`,
         FD: 'DivideEqually',
         EOD: parseInt(vestingMonths),
-        vestPers: 0,
+        vestPers: displayVesting < 100 ? 100 - displayVesting : 0,
         LockPeriod: 0
       };
       tempData.push(newData);
@@ -112,6 +130,13 @@ const Vesting = props => {
         parseInt(tempData[tempData.length - 2].EOD)
     ) {
       tempData.pop();
+    } else{
+      setDisplayVesting(displayVesting + tempData[tempData.length - 1].vestPers)
+    }
+    for (let i = 2; i < tempData.length + 1; i++) {
+      if (parseInt(tempData[i - 1].EOD) - 1 === parseInt(tempData[i - 2].EOD)) {
+        tempData[i - 1].FD = 'Fixed';
+      }
     }
     setData(tempData);
   };
@@ -133,7 +158,11 @@ const Vesting = props => {
       totalPers += parseFloat(ele.vestPers);
     });
     tempVar = totalPers;
-    if (totalPers < 100 && !zeroFlag) {
+    if (
+      totalPers < 100 &&
+      !zeroFlag &&
+      !(parseInt(tempData[tempData.length - 1].EOD) === parseInt(vestingMonths))
+    ) {
       const newData = {
         key: data.length + 1,
         name: `${data.length + 1} Vesting`,
@@ -274,6 +303,12 @@ const Vesting = props => {
             optionFilterProp='children'
             value={text}
             onChange={e => onChangeFD(e, record)}
+            disabled={
+              data[record.key - 1] &&
+              data[record.key - 2] &&
+              parseInt(data[record.key - 1].EOD) - 1 ===
+                parseInt(data[record.key - 2].EOD)
+            }
           >
             <Select.Option value='Fixed'>Fixed</Select.Option>
             <Select.Option value='DivideEqually'>Divide Equally</Select.Option>
@@ -292,8 +327,8 @@ const Vesting = props => {
           start = 1;
           min = 1;
         } else {
-          start = data[record.key - 2].EOD;
-          min = parseInt(start) + 1;
+          start = data[record.key - 2].EOD + 1;
+          min = parseInt(start);
         }
         return (
           <>
@@ -326,11 +361,24 @@ const Vesting = props => {
       render: (text, record) => {
         return (
           <InputNumber
-            onChange={() => onChangeLockPeriod(record)}
+            onChange={e => onChangeLockPeriod(e, record)}
             value={text}
           />
         );
       }
+    },
+    {
+      title: 'operation',
+      dataIndex: 'operation',
+      render: (text, record) =>
+        data.length >= 1 ? (
+          <Popconfirm
+            title='Sure to delete?'
+            onConfirm={() => handleDeleteRow(record.key)}
+          >
+            <a>Delete</a>
+          </Popconfirm>
+        ) : null
     }
   ];
 
@@ -348,12 +396,6 @@ const Vesting = props => {
     setData(tempData);
   };
 
-  const handleDelete = () => {
-    let tempData = [...data];
-    const x = tempData.pop();
-    setDisplayVesting(displayVesting - x.vestPers);
-    setData(tempData);
-  };
 
   const handleNextPhase = () => {
     props.NextTab('phase');
@@ -411,14 +453,6 @@ const Vesting = props => {
               Add a row
             </Button>
           )}
-          <Button
-            onClick={handleDelete}
-            type='primary'
-            disabled={data.length <= 1}
-            style={{ marginBottom: 2, marginLeft: 8 }}
-          >
-            Delete row
-          </Button>
         </div>
         <Table
           tableLayout='auto'
