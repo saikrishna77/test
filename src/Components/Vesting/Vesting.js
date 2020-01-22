@@ -66,6 +66,9 @@ const Vesting = props => {
     } else if (!vestingName) {
       setErrMsg('Give the vesting a name, dugh!');
       setSetError(true);
+    } else if (vestingName && vestingName.toString().length() < 1) {
+      setErrMsg('Give the vesting a name, dugh!');
+      setSetError(true);
     } else if (!vestingMonths) {
       setErrMsg(`Don't your vesting have a duration, dugh!`);
       setSetError(true);
@@ -130,8 +133,10 @@ const Vesting = props => {
         parseInt(tempData[tempData.length - 2].EOD)
     ) {
       tempData.pop();
-    } else{
-      setDisplayVesting(displayVesting + tempData[tempData.length - 1].vestPers)
+    } else {
+      setDisplayVesting(
+        displayVesting + tempData[tempData.length - 1].vestPers
+      );
     }
     for (let i = 2; i < tempData.length + 1; i++) {
       if (parseInt(tempData[i - 1].EOD) - 1 === parseInt(tempData[i - 2].EOD)) {
@@ -242,7 +247,7 @@ const Vesting = props => {
         console.log('vestingName: ' + vestingName);
         const payload = {
           totalVestingMonths: vestingMonths,
-          vestingName: vestingName.toString().replace(/ +/g, ''),
+          vestingName: vestingName.toString(),
           firebaseTokenID: props.TokenID,
           data: data
         };
@@ -395,7 +400,6 @@ const Vesting = props => {
     tempData.push(newData);
     setData(tempData);
   };
-
 
   const handleNextPhase = () => {
     props.NextTab('phase');
