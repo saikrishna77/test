@@ -12,7 +12,7 @@ import {
   Modal
 } from 'antd';
 import { Link } from 'react-router-dom';
-import metamask from '../../utils/metamask';
+import { MetamaskService } from '../../utils/metamask';
 
 class RegistrationForm extends React.Component {
   state = {
@@ -27,7 +27,7 @@ class RegistrationForm extends React.Component {
     };
     this.props.form.validateFieldsAndScroll(async (err, values) => {
       if (!err) {
-        let msg = await metamask();
+        let msg = await MetamaskService();
         if (msg === 'Install metamask') {
           return Modal.error({
             title: 'Metamask Extension not found',
@@ -91,7 +91,7 @@ class RegistrationForm extends React.Component {
     };
 
     return (
-      <Card style={{ margin: '5% 0 0 15%', width: '70%' }}>
+      <Card style={{ margin: '1% 0 0 15%', width: '70%' }}>
         <h2>Sign up!</h2>
         <Form
           {...formItemLayout}
@@ -159,6 +159,61 @@ class RegistrationForm extends React.Component {
                 }
               ]
             })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+          </Form.Item>
+          <Form.Item label='Phone'>
+            {getFieldDecorator('phone', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input your Phone Number!',
+                  whitespace: true
+                }
+              ]
+            })(<Input type='number' />)}
+          </Form.Item>
+          <Form.Item label='Token Phase'>
+            {getFieldDecorator('token-phase', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input token phase!',
+                  whitespace: true
+                }
+              ]
+            })(<Input />)}
+          </Form.Item>
+          <Form.Item label='Amount to raise'>
+            {getFieldDecorator('Amount', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input amount to raise!',
+                  whitespace: true
+                }
+              ]
+            })(<Input type='number' />)}
+          </Form.Item>
+          <Form.Item label='Underlying Asset'>
+            {getFieldDecorator('UnderAsset', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input underlying asset!',
+                  whitespace: true
+                }
+              ]
+            })(<Input />)}
+          </Form.Item>
+          <Form.Item label='Tentative Date'>
+            {getFieldDecorator('UnderAsset', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input tentative date!',
+                  whitespace: true
+                }
+              ]
+            })(<Input />)}
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
             <Button type='primary' htmlType='submit'>

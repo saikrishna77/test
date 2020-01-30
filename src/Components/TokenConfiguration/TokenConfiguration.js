@@ -1,4 +1,4 @@
-import { Menu, Card } from 'antd';
+import { Menu, Card, Button } from 'antd';
 import React from 'react';
 import TokenType from '../TokenType/TokenType';
 import { Row, Icon } from 'antd';
@@ -19,7 +19,7 @@ const TokenConfig = () => {
     setCurrent(next);
   };
   return (
-    <Card>
+    <Card style={{ marginTop: '20px' }}>
       <Menu onClick={handleClick} selectedKeys={[current]} mode='horizontal'>
         <Menu.Item key='tType' disabled={current !== 'tType'}>
           Token Type and Details &nbsp;
@@ -42,7 +42,7 @@ const TokenConfig = () => {
         </Menu.Item>
       </Menu>
       {current === 'tType' ? (
-        <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
+        <Row justify='center' style={{ paddingTop: '2%' }}>
           <b>
             Define Your Token Type, Number Of Investors, Lock Period For
             Investors
@@ -52,7 +52,7 @@ const TokenConfig = () => {
           </div>
         </Row>
       ) : current === 'vesting' ? (
-        <Row justify='center' style={{ minHeight: '100vh', paddingTop: '2%' }}>
+        <Row justify='center' style={{ paddingTop: '2%' }}>
           <b>Vesting Schedule</b>
           <div style={{ marginTop: '1%' }}>
             <Vesting NextTab={handleNextClick} TokenID={firebaseTokenID} />

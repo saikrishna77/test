@@ -1,11 +1,11 @@
 import Web3 from 'web3';
 
+let web3;
+let ethereum;
+let selectedWallet;
 const MetamaskService = async () => {
   try {
-    let web3;
-    let ethereum;
     // const networkId$;
-    let selectedWallet;
     // const selectedToken;
 
     if (typeof window['ethereum'] === 'undefined') {
@@ -35,4 +35,4 @@ const MetamaskService = async () => {
   }
 };
 
-export default MetamaskService;
+export { MetamaskService, web3, ethereum };
