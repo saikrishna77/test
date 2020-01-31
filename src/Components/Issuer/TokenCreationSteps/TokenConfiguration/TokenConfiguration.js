@@ -1,8 +1,8 @@
 import { Menu, Card, Button } from 'antd';
 import React from 'react';
-import TokenType from '../TokenType/TokenType';
+import TokenType from './TokenType/TokenType';
 import { Row, Icon } from 'antd';
-import Vesting from '../Vesting/Vesting';
+import Vesting from './Vesting/Vesting';
 
 const TokenConfig = () => {
   const [current, setCurrent] = React.useState('tType');

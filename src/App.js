@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
-import TokenConfig from './Components/TokenConfiguration/TokenConfiguration';
+import TokenConfig from './Components/Issuer/TokenCreationSteps/TokenConfiguration/TokenConfiguration';
 import { Row } from 'antd';
 import { Switch, Route } from 'react-router-dom';
 import RegisterForm from './Components/Register/Register';
 import LoginForm from './Components/Login/Login';
-import ReserveToken from './Components/ReserveToken/ReserveToken';
-import TokenCreationSteps from './Components/TokenCreationSteps/TokenCreationSteps';
-import UserSideBar from './Components/UserSideBar/UserSideBar';
+import ReserveToken from './Components/Issuer/TokenCreationSteps/ReserveToken/ReserveToken';
+import TokenCreationSteps from './Components/Issuer/TokenCreationSteps/TokenCreationSteps';
+import UserSideBar from './Components/SideBar/SideBar';
 import IssuerSuperAdmins from './Components/Admin/IssuerSuperAdmins/IssuerSuperAdmins';
 import RegistrationRequest from './Components/Admin/RegistrationRequests/RegistrationRequests';
 
@@ -35,7 +35,7 @@ function App() {
         <Route exact path='/register' component={RegisterFormComp}></Route>
         <Route exact path='/login' component={LoginForm}></Route>
         {/* <Route exact path='/' component={TokenConfigComp}></Route> */}
-        <Route exact path='/reserveToken' component={ReserveToken}></Route>
+        {/* <Route exact path='/reserveToken' component={ReserveToken}></Route> */}
         <Route
           exact
           path='/issuerSuperAdmins'
@@ -50,7 +50,6 @@ function App() {
           path='/tokenCreation/:stepType'
           component={TokenCreationSteps}
         ></Route>
-        <Route exact path='/token/list' component={ReserveToken}></Route>
       </Switch>
     </div>
   );

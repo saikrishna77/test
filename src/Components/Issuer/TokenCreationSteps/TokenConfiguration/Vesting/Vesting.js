@@ -13,7 +13,7 @@ import {
   Popconfirm
 } from 'antd';
 import axios from 'axios';
-import api_url from '../../api_url';
+import api_url from '../../../../../api_url';
 
 const Vesting = props => {
   // console.log(props.TokenID);

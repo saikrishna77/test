@@ -11,7 +11,7 @@ import {
   notification
 } from 'antd';
 import axios from 'axios';
-import api_url from '../../api_url';
+import api_url from '../../../../../api_url';
 
 class TokenType extends React.Component {
   state = {

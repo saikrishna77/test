@@ -1,9 +1,9 @@
 import React from 'react';
 import { Steps, Icon, Card } from 'antd';
 import { withRouter } from 'react-router-dom';
-import TokenConfiguration from '../TokenConfiguration/TokenConfiguration';
-import ReserveToken from '../ReserveToken/ReserveToken';
-import Roles from '../Roles/Roles';
+import TokenConfiguration from './TokenConfiguration/TokenConfiguration';
+import ReserveToken from './ReserveToken/ReserveToken';
+import Roles from './Roles/Roles';
 
 const { Step } = Steps;
 
