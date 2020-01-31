@@ -1,8 +1,10 @@
 import React from 'react';
 import { Table, Card } from 'antd';
 import { withRouter } from 'react-router-dom';
+import { FirebaseContext } from '../../../utils/Firebase';
 
 const IssuerSuperAdmins = () => {
+  const context = React.useContext(FirebaseContext);
   const dataSource = [
     {
       key: '1',
@@ -68,6 +70,7 @@ const IssuerSuperAdmins = () => {
           fontWeight: 'bold'
         }}
       >
+        {console.log(context)}
         List Of All Issuer Super Admins
       </div>
       <Table

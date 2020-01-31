@@ -16,7 +16,7 @@ const TokenCreationSteps = props => {
   });
 
   const stepOnClick = e => {
-    props.history.push('/tokenCreation/' + e);
+    props.history.push('/issuer/tokenCreation/' + e);
   };
 
   console.log(props.match.params.stepNo);
