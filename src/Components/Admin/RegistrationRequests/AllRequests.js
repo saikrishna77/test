@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Card, Divider } from 'antd';
 import { withRouter } from 'react-router-dom';
+import Details from './Details';
 
 const AllRequests = () => {
   const { Column } = Table;
@@ -24,7 +25,7 @@ const AllRequests = () => {
   ];
 
   const showDetails = record => {
-    console.log(record);
+    Details();
   };
 
   return (
