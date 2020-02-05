@@ -40,7 +40,7 @@ const UserSideBar = props => {
             textOverflow: 'ellipsis'
           }}
         >
-          <Icon type='user' /> Hdsnc1234567fxcgfhgjhkj
+          <Icon type='user' /> {localStorage.getItem('email')}
         </Text>
       </Header>
       <Sider
@@ -60,7 +60,8 @@ const UserSideBar = props => {
             marginTop: '30%',
             display: 'flex',
             alignContent: 'start',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            textAlign: 'left'
           }}
           theme='dark'
           mode='inline'
@@ -70,12 +71,26 @@ const UserSideBar = props => {
             <Icon type='user' />
             <span className='nav-text'>DashBoard</span>
           </Menu.Item>
-          <Menu.Item key='2'>
+          <Menu.Item
+            key='2'
+            onClick={() => {
+              props.history.push('/issuer/tokenCreation/reserve');
+            }}
+          >
             <Icon type='setting' />
             <span className='nav-text'>Token Creation</span>
           </Menu.Item>
           <Menu.Item
             key='3'
+            onClick={() => {
+              props.history.push('/issuer/tokens');
+            }}
+          >
+            <Icon type='setting' />
+            <span className='nav-text'>Tokens</span>
+          </Menu.Item>
+          <Menu.Item
+            key='4'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}
           >

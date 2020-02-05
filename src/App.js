@@ -12,6 +12,7 @@ import IssuerSuperAdmins from './Components/Admin/IssuerSuperAdmins/IssuerSuperA
 import RegistrationRequest from './Components/Admin/RegistrationRequests/RegistrationRequests';
 import SideBar from './Components/Admin/Sidebar/Sidebar';
 import IssuerSideBar from './Components/Issuer/SideBar/SideBar';
+import Tokens from './Components/Issuer/Tokens/Tokens';
 
 function App() {
   const RegisterFormComp = () => {
@@ -27,47 +28,58 @@ function App() {
         <SideBar />
       </div> */}
       {/* <FirebaseContext.Provider value={new Firebase()}> */}
-        <Switch>
-          <Route exact path='/register' component={RegisterFormComp}></Route>
-          <Route exact path='/login' component={LoginForm}></Route>
-          {/* <Route exact path='/' component={TokenConfigComp}></Route> */}
-          {/* <Route exact path='/reserveToken' component={ReserveToken}></Route> */}
-          <Route
-            exact
-            path='/admin/issuerSuperAdmins'
-            render={props => (
-              <>
-                <SideBar />
-                <div style={{ marginTop: '6%', marginLeft: '10%' }}>
-                  <IssuerSuperAdmins />
-                </div>
-              </>
-            )}
-          ></Route>
-          <Route
-            exact
-            path='/admin/registrationRequests'
-            render={props => (
-              <>
-                <SideBar />
-                <div style={{ marginTop: '6%', marginLeft: '10%' }}>
-                  <RegistrationRequest />
-                </div>
-              </>
-            )}
-          ></Route>
-          <Route
-            path='/issuer/tokenCreation/:stepType'
-            render={props => (
-              <>
-                <IssuerSideBar />
-                <div style={{ marginTop: '6%', marginLeft: '10%' }}>
-                  <TokenCreationSteps />
-                </div>
-              </>
-            )}
-          ></Route>
-        </Switch>
+      <Switch>
+        <Route exact path='/register' component={RegisterFormComp}></Route>
+        <Route exact path='/login' component={LoginForm}></Route>
+        {/* <Route exact path='/' component={TokenConfigComp}></Route> */}
+        {/* <Route exact path='/reserveToken' component={ReserveToken}></Route> */}
+        <Route
+          exact
+          path='/admin/issuerSuperAdmins'
+          render={props => (
+            <>
+              <SideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <IssuerSuperAdmins />
+              </div>
+            </>
+          )}
+        ></Route>
+        <Route
+          exact
+          path='/admin/registrationRequests'
+          render={props => (
+            <>
+              <SideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <RegistrationRequest />
+              </div>
+            </>
+          )}
+        ></Route>
+        <Route
+          path='/issuer/tokenCreation/:stepType'
+          render={props => (
+            <>
+              <IssuerSideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <TokenCreationSteps />
+              </div>
+            </>
+          )}
+        ></Route>
+        <Route
+          path='/issuer/tokens'
+          render={props => (
+            <>
+              <IssuerSideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <Tokens />
+              </div>
+            </>
+          )}
+        ></Route>
+      </Switch>
       {/* </FirebaseContext.Provider> */}
     </div>
   );
