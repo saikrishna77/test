@@ -1,32 +1,38 @@
 import React from 'react';
 import { Form, Icon, Input, Button, Checkbox, Card } from 'antd';
-import { Link } from 'react-router-dom';
-import { FirebaseContext } from '../../utils/Firebase';
+import { Link, withRouter } from 'react-router-dom';
+import firebase from '../../utils/Firebase/firebase';
 
 const NormalLoginForm = props => {
-  const context = React.useContext(FirebaseContext);
-
   const handleSubmit = e => {
     e.preventDefault();
     props.form.validateFields(async (err, values) => {
       if (!err) {
         try {
-          let res = await context.doSignInWithEmailAndPassword(
-            values.username,
-            values.password
-          );
+          let res = await firebase
+            .auth()
+            .signInWithEmailAndPassword(values.username, values.password);
           console.log('Received values of form: ', values);
           console.log(res.user.uid);
-          const userId = context.auth().currentUser.uid;
-          context
-            .database()
-            .ref('/users/' + userId)
-            .once('value')
-            .then(function(snapshot) {
-              console.log(snapshot.val());
-            });
+          const db = firebase.firestore();
+          const doc = await db
+            .collection('users')
+            .doc(res.user.uid)
+            .get();
+          if (!doc.exists) {
+            console.log('No such document!');
+          } else {
+            localStorage.setItem('uid', res.user.uid);
+            localStorage.setItem('email', res.user.email);
+            if (doc.data().role === 'issuer') {
+              props.history.push('/issuer/tokenCreation/reserve');
+            } else {
+              props.history.push('/admin/issuerSuperAdmins');
+            }
+            console.log('Document data:', doc.data());
+          }
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
       }
     });
@@ -129,4 +135,4 @@ const WrappedNormalLoginForm = Form.create({ name: 'normal_login' })(
   NormalLoginForm
 );
 
-export default WrappedNormalLoginForm;
+export default withRouter(WrappedNormalLoginForm);

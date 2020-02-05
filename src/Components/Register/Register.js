@@ -11,8 +11,9 @@ import {
   Card,
   Modal
 } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { MetamaskService } from '../../utils/metamask';
+import firebase from '../../utils/Firebase/firebase';
 
 class RegistrationForm extends React.Component {
   state = {
@@ -37,6 +38,33 @@ class RegistrationForm extends React.Component {
             }
           });
         }
+        firebase
+          .auth()
+          .createUserWithEmailAndPassword(values.email, values.password)
+          .then(async res => {
+            const db = firebase.firestore();
+            await db
+              .collection('users')
+              .doc(res.user.uid)
+              .set({
+                uid: res.user.uid,
+                email: res.user.email,
+                firstName: values.firstname,
+                lastName: values.lastname,
+                phone: values.phone,
+                tokenphase: values.tokenphase,
+                amount: values.amount,
+                underlyingAsset: values.UnderlyingAsset,
+                tentativeDate: values.tentativeDate,
+                role: 'issuer',
+                userRegisterTimeStamp: Date.now()
+              });
+            this.props.history.push('/issuer/tokenCreation/reserve');
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
         console.log('Received values of form: ', values);
       }
     });
@@ -172,7 +200,7 @@ class RegistrationForm extends React.Component {
             })(<Input type='number' />)}
           </Form.Item>
           <Form.Item label='Token Phase'>
-            {getFieldDecorator('token-phase', {
+            {getFieldDecorator('tokenphase', {
               rules: [
                 {
                   required: true,
@@ -183,7 +211,7 @@ class RegistrationForm extends React.Component {
             })(<Input />)}
           </Form.Item>
           <Form.Item label='Amount to raise'>
-            {getFieldDecorator('Amount', {
+            {getFieldDecorator('amount', {
               rules: [
                 {
                   required: true,
@@ -194,7 +222,7 @@ class RegistrationForm extends React.Component {
             })(<Input type='number' />)}
           </Form.Item>
           <Form.Item label='Underlying Asset'>
-            {getFieldDecorator('UnderAsset', {
+            {getFieldDecorator('UnderlyingAsset', {
               rules: [
                 {
                   required: true,
@@ -205,7 +233,7 @@ class RegistrationForm extends React.Component {
             })(<Input />)}
           </Form.Item>
           <Form.Item label='Tentative Date'>
-            {getFieldDecorator('UnderAsset', {
+            {getFieldDecorator('tentativeDate', {
               rules: [
                 {
                   required: true,
@@ -233,4 +261,4 @@ const WrappedRegistrationForm = Form.create({ name: 'register' })(
   RegistrationForm
 );
 
-export default WrappedRegistrationForm;
+export default withRouter(WrappedRegistrationForm);

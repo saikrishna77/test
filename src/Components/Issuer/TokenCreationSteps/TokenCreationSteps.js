@@ -12,7 +12,6 @@ const TokenCreationSteps = props => {
 
   React.useEffect(() => {
     setStepType(props.match.params.stepType);
-    console.log(stepType);
   });
 
   const stepOnClick = e => {

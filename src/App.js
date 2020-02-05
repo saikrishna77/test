@@ -10,7 +10,6 @@ import TokenCreationSteps from './Components/Issuer/TokenCreationSteps/TokenCrea
 // import UserSideBar from './Components/SideBar/SideBar';
 import IssuerSuperAdmins from './Components/Admin/IssuerSuperAdmins/IssuerSuperAdmins';
 import RegistrationRequest from './Components/Admin/RegistrationRequests/RegistrationRequests';
-import Firebase, { FirebaseContext, withFirebase } from './utils/Firebase';
 import SideBar from './Components/Admin/Sidebar/Sidebar';
 import IssuerSideBar from './Components/Issuer/SideBar/SideBar';
 
@@ -27,7 +26,7 @@ function App() {
       {/* <div style={{ position: 'absolute', height: '100vh' }}>
         <SideBar />
       </div> */}
-      <FirebaseContext.Provider value={new Firebase()}>
+      {/* <FirebaseContext.Provider value={new Firebase()}> */}
         <Switch>
           <Route exact path='/register' component={RegisterFormComp}></Route>
           <Route exact path='/login' component={LoginForm}></Route>
@@ -69,7 +68,7 @@ function App() {
             )}
           ></Route>
         </Switch>
-      </FirebaseContext.Provider>
+      {/* </FirebaseContext.Provider> */}
     </div>
   );
 }

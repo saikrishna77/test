@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Select, Input, Popconfirm } from 'antd';
 import { withRouter } from 'react-router-dom';
+import firebase from '../../../../utils/Firebase/firebase';
 
 const Roles = props => {
   const [data, setData] = React.useState([]);
@@ -27,13 +28,46 @@ const Roles = props => {
     setData(tempData);
   };
 
-  const handleSubmit = () => {
-    props.history.push('/tokenCreation/tokenConfig');
+  const handleSubmit = async () => {
+    const search = props.location.search; // could be '?foo=bar'
+    const params = new URLSearchParams(search);
+    const symbol = params.get('symbol'); // bar
+    console.log(symbol);
+    const db = firebase.firestore();
+    await db
+      .collection('reservedTokenSymbols')
+      .doc(symbol + '-' + localStorage.getItem('uid'))
+      .update({
+        roles: data
+      });
+    props.history.push('/issuer/tokenCreation/tokenConfig?symbol=' + symbol);
   };
 
   const handleDeleteRow = key => {
     let tempdata = [...data];
     setData(tempdata.filter(item => item.key !== key));
+  };
+
+  const onChangeType = (e, record) => {
+    let tempData = [...data];
+    for (let i = 0; i < tempData.length; i++) {
+      if (tempData[i].key === record.key) {
+        tempData[i].roleType = e;
+        break;
+      }
+    }
+    setData(tempData);
+  };
+
+  const onChangeRole = (e, record) => {
+    let tempData = [...data];
+    for (let i = 0; i < tempData.length; i++) {
+      if (tempData[i].key === record.key) {
+        tempData[i].role = e.target.value;
+        break;
+      }
+    }
+    setData(tempData);
   };
 
   const columns = [
@@ -57,13 +91,7 @@ const Roles = props => {
             placeholder='Select a person'
             optionFilterProp='children'
             value={text}
-            // onChange={e => onChangeFD(e, record)}
-            disabled={
-              data[record.key - 1] &&
-              data[record.key - 2] &&
-              parseInt(data[record.key - 1].EOD) - 1 ===
-                parseInt(data[record.key - 2].EOD)
-            }
+            onChange={e => onChangeType(e, record)}
           >
             <Select.Option value='Employee'>Employee</Select.Option>
             <Select.Option value='Affliate'>Affliate</Select.Option>
@@ -76,12 +104,7 @@ const Roles = props => {
       key: 'role',
       dataIndex: 'role',
       render: (text, record) => {
-        return (
-          <Input
-            // onBlur={e => onChangeVestPres(e, record)}
-            value={text}
-          />
-        );
+        return <Input onChange={e => onChangeRole(e, record)} value={text} />;
       }
     },
     {

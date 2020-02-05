@@ -2,6 +2,10 @@ import React from 'react';
 import { Card, Input, Button } from 'antd';
 
 const Reserve = props => {
+  const [symbol, setSymbol] = React.useState();
+  const changeHandler = e => {
+    setSymbol(e.target.value);
+  };
   return (
     <Card style={{ width: '80%', margin: 'auto' }}>
       <h1>Reserve Your Token Symbol</h1>
@@ -13,7 +17,7 @@ const Reserve = props => {
       </h3>
       <Card style={{ marginTop: '5%' }}>
         <h2>Enter Token Symbol</h2>
-        <Input />
+        <Input onChange={changeHandler} />
         <h3 style={{ marginTop: '3%' }}>
           <b>Issuer ETH Address</b>
         </h3>
@@ -25,7 +29,7 @@ const Reserve = props => {
         <Button
           type='primary'
           style={{ marginTop: '3%' }}
-          onClick={props.changeState}
+          onClick={() => props.changeState(symbol)}
         >
           Reserve Token Symbol
         </Button>

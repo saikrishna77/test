@@ -10,8 +10,7 @@ import {
   Icon,
   notification
 } from 'antd';
-import axios from 'axios';
-import api_url from '../../../../../api_url';
+import firebase from '../../../../../utils/Firebase/firebase';
 
 class TokenType extends React.Component {
   state = {
@@ -44,13 +43,23 @@ class TokenType extends React.Component {
           }
         }
         try {
-          let res = await axios.post(api_url + 'tokenType', values);
+          const search = this.props.location.search; // could be '?foo=bar'
+          const params = new URLSearchParams(search);
+          const symbol = params.get('symbol'); // bar
+          console.log(symbol);
+          const db = firebase.firestore();
+          await db
+            .collection('reservedTokenSymbols')
+            .doc(symbol + '-' + localStorage.getItem('uid'))
+            .update({
+              TokenType: values
+            });
           notification.success({
             message: `Saved`,
             description: 'The Token Type and Details are saved.',
             placement: 'topRight'
           });
-          this.props.NextTab('vesting', res.data.id);
+          // this.props.NextTab('vesting', res.data.id);
         } catch (e) {
           console.log(e);
           notification.error({

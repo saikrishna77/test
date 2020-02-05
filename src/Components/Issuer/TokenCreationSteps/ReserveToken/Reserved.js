@@ -10,7 +10,7 @@ const CountdownCompleted = () => (
 const Reserve = props => {
   const renderer = ({ hours, minutes, seconds, completed }) => {
     if (completed) {
-      props.history.push('/tokenCreation/roles');
+      props.history.push('/issuer/tokenCreation/roles');
       return <CountdownCompleted />;
     } else {
       // Render a countdown

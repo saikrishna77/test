@@ -1,9 +1,16 @@
-import { Layout, Menu, Icon, Typography, Input } from 'antd';
+import { Layout, Menu, Icon, Typography } from 'antd';
 import React from 'react';
+import firebase from '../../../utils/Firebase/firebase';
+import { withRouter } from 'react-router-dom';
 const { Text } = Typography;
 
-const { Header, Content, Footer, Sider } = Layout;
-const UserSideBar = () => {
+const { Header, Sider } = Layout;
+
+const UserSideBar = props => {
+  const logout = () => {
+    firebase.auth().signOut();
+    props.history.push('/login');
+  };
   return (
     <Layout>
       <Header
@@ -15,11 +22,25 @@ const UserSideBar = () => {
         }}
       >
         <div className='logo' />
-        <Text style={{ color: 'white', float: 'left', fontSize: '20px',marginLeft:'2%' }}>
+        <Text
+          style={{
+            color: 'white',
+            float: 'left',
+            fontSize: '20px',
+            marginLeft: '2%'
+          }}
+        >
           CCAP
         </Text>
-        <Text style={{ color: 'white', float: 'right', fontSize: '15px' ,textOverflow:'ellipsis'}}>
-         <Icon type="user"/> Hdsnc1234567fxcgfhgjhkj 
+        <Text
+          style={{
+            color: 'white',
+            float: 'right',
+            fontSize: '15px',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          <Icon type='user' /> Hdsnc1234567fxcgfhgjhkj
         </Text>
       </Header>
       <Sider
@@ -43,7 +64,7 @@ const UserSideBar = () => {
           }}
           theme='dark'
           mode='inline'
-          defaultSelectedKeys={['1']}
+          defaultSelectedKeys={['2']}
         >
           <Menu.Item key='1'>
             <Icon type='user' />
@@ -53,9 +74,17 @@ const UserSideBar = () => {
             <Icon type='setting' />
             <span className='nav-text'>Token Creation</span>
           </Menu.Item>
+          <Menu.Item
+            key='3'
+            style={{ position: 'absolute', marginTop: '86vh' }}
+            onClick={logout}
+          >
+            <Icon type='logout' />
+            <span className='nav-text'>Logout</span>
+          </Menu.Item>
         </Menu>
       </Sider>
     </Layout>
   );
 };
-export default UserSideBar;
+export default withRouter(UserSideBar);

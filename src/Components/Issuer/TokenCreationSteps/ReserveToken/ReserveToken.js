@@ -3,8 +3,9 @@ import { withRouter } from 'react-router-dom';
 import { Card, Input, Button, Modal } from 'antd';
 import Reserve from './Reserve';
 import Reserved from './Reserved';
+import firebase from '../../../../utils/Firebase/firebase';
 
-const ReserveToken = () => {
+const ReserveToken = props => {
   const [selectedWallet, setSelectedWallet] = React.useState('');
   const [tokenReserved, setTokenReserved] = React.useState(false);
   let ethereum = window['ethereum'];
@@ -22,15 +23,31 @@ const ReserveToken = () => {
     };
     asyncEffect();
   });
-  const changeState = () => {
-    setTokenReserved(!tokenReserved);
+  const changeState = async symbol => {
+    const db = firebase.firestore();
+    await db
+      .collection('reservedTokenSymbols')
+      .doc(symbol + '-' + localStorage.getItem('uid'))
+      .set({
+        basicDetails: {
+          issuer: localStorage.getItem('uid'),
+          email: localStorage.getItem('email'),
+          symbolCreationTime: Date.now(),
+          symbol: symbol,
+          ethereumAddress: selectedWallet
+        }
+      });
+    props.history.push('/issuer/tokenCreation/roles?symbol=' + symbol);
+    // setTokenReserved(!tokenReserved);
   };
   ethereum.on('accountsChanged', async accounts => {
     setSelectedWallet(accounts[0]);
   });
   return (
     <div style={{ marginTop: '7%' }}>
-      {!tokenReserved ? <Reserve selectedWallet={selectedWallet} changeState={changeState}/> : null}
+      {!tokenReserved ? (
+        <Reserve selectedWallet={selectedWallet} changeState={changeState} />
+      ) : null}
       {tokenReserved ? <Reserved selectedWallet={selectedWallet} /> : null}
       {/* <Button onClick={changeState}>ChangeState</Button> */}
     </div>
