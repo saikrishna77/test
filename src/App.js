@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import TokenConfig from './Components/Issuer/TokenCreationSteps/TokenConfiguration/TokenConfiguration';
 import { Row } from 'antd';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, withRouter } from 'react-router-dom';
 import RegisterForm from './Components/Register/Register';
 import LoginForm from './Components/Login/Login';
 import ReserveToken from './Components/Issuer/TokenCreationSteps/ReserveToken/ReserveToken';
@@ -13,8 +13,32 @@ import RegistrationRequest from './Components/Admin/RegistrationRequests/Registr
 import SideBar from './Components/Admin/Sidebar/Sidebar';
 import IssuerSideBar from './Components/Issuer/SideBar/SideBar';
 import Tokens from './Components/Issuer/Tokens/Tokens';
+import firebase from './utils/firebase';
 
-function App() {
+function App(props) {
+  React.useEffect(() => {
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (user) {
+        const db = firebase.firestore();
+        const doc = await db
+          .collection('users')
+          .doc(user.uid)
+          .get();
+        if (!doc.exists) {
+          console.log('No such document!');
+        } else {
+          if (doc.data().role === 'issuer') {
+            props.history.push('/issuer/tokens');
+          } else {
+            props.history.push('/admin/issuerSuperAdmins');
+          }
+          console.log('Document data:', doc.data());
+        }
+      } else {
+        props.history.push('/login');
+      }
+    });
+  }, []);
   const RegisterFormComp = () => {
     return (
       <div>
@@ -78,4 +102,4 @@ function App() {
   );
 }
 
-export default App;
+export default withRouter(App);

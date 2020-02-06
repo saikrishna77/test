@@ -4,11 +4,14 @@ import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../utils/firebase';
 
 const NormalLoginForm = props => {
+  const [err, setError] = React.useState();
+  const [loading, setLoading] = React.useState(false);
   const handleSubmit = e => {
     e.preventDefault();
     props.form.validateFields(async (err, values) => {
       if (!err) {
         try {
+          setLoading(true);
           let res = await firebase
             .auth()
             .signInWithEmailAndPassword(values.username, values.password);
@@ -31,8 +34,18 @@ const NormalLoginForm = props => {
             }
             console.log('Document data:', doc.data());
           }
+          setLoading(false);
         } catch (e) {
-          console.error(e);
+          setLoading(false);
+          if (e.code === 'auth/user-not-found') {
+            console.error(e);
+            setError('User not found');
+          } else if (e.code === 'auth/wrong-password') {
+            console.error(e);
+            setError('Wrong Credentials');
+          } else {
+            console.log(e.code);
+          }
         }
       }
     });
@@ -57,6 +70,7 @@ const NormalLoginForm = props => {
         }}
       >
         <Form.Item
+          validateStatus={err ? 'error' : ''}
           style={{
             width: '40%',
             margin: 'auto'
@@ -88,6 +102,8 @@ const NormalLoginForm = props => {
             width: '40%',
             margin: 'auto'
           }}
+          validateStatus={err ? 'error' : ''}
+          help={err}
         >
           {getFieldDecorator('password', {
             rules: [
@@ -120,6 +136,7 @@ const NormalLoginForm = props => {
             type='primary'
             htmlType='submit'
             className='login-form-button'
+            loading={loading}
           >
             Log in
           </Button>

@@ -1,32 +1,40 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
-import { Card, Row, Col, Button, Empty } from 'antd';
+import { Card, Row, Col, Button, Empty, Spin } from 'antd';
 
 const Tokens = props => {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const db = firebase.firestore();
-    const tokenRef = db.collection('reservedTokenSymbols');
-    let query = tokenRef
-      .where('basicDetails.issuer', '==', localStorage.getItem('uid'))
-      .get()
-      .then(snapshot => {
-        if (snapshot.empty) {
-          console.log('No matching documents.');
-          return;
-        }
-        let tempData = [];
-        snapshot.forEach(doc => {
-          tempData.push({ ...doc.data(), id: doc.id });
-          console.log(doc.id, '=>', doc.data());
-        });
-        setData(tempData);
-      })
-      .catch(err => {
-        console.log('Error getting documents', err);
-      });
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (user) {
+        const db = firebase.firestore();
+        const tokenRef = db.collection('reservedTokenSymbols');
+        tokenRef
+          .where('basicDetails.issuer', '==', localStorage.getItem('uid'))
+          .get()
+          .then(snapshot => {
+            if (snapshot.empty) {
+              console.log('No matching documents.');
+              return;
+            }
+            let tempData = [];
+            snapshot.forEach(doc => {
+              tempData.push({ ...doc.data(), id: doc.id });
+              console.log(doc.id, '=>', doc.data());
+            });
+            setData(tempData);
+            setLoading(false);
+          })
+          .catch(err => {
+            console.log('Error getting documents', err);
+          });
+      } else {
+        props.history.push('/login');
+      }
+    });
   }, []);
 
   const RenderCards = () => {
@@ -84,7 +92,8 @@ const Tokens = props => {
 
   return (
     <div style={{ marginLeft: '80px' }}>
-      {data.length > 0 ? RenderCards() : <Empty />}
+      {loading ? <Spin /> : null}
+      {data.length || loading > 0 ? RenderCards() : <Empty />}
     </div>
   );
 };
