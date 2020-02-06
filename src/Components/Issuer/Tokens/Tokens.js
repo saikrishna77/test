@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
-import { Card, Row, Col, Button } from 'antd';
+import { Card, Row, Col, Button, Empty } from 'antd';
 
 const Tokens = props => {
   const [data, setData] = React.useState([]);
@@ -82,7 +82,11 @@ const Tokens = props => {
     return <Row gutter={[16, 26]}>{cardsArr}</Row>;
   };
 
-  return <div style={{ marginLeft: '80px' }}>{RenderCards()}</div>;
+  return (
+    <div style={{ marginLeft: '80px' }}>
+      {data.length > 0 ? RenderCards() : <Empty />}
+    </div>
+  );
 };
 
 export default withRouter(Tokens);

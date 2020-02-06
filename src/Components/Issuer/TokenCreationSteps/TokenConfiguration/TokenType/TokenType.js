@@ -8,9 +8,11 @@ import {
   Card,
   Tooltip,
   Icon,
-  notification
+  notification,
+  Popconfirm
 } from 'antd';
 import firebase from '../../../../../utils/firebase';
+import { withRouter } from 'react-router-dom';
 
 class TokenType extends React.Component {
   state = {
@@ -18,8 +20,51 @@ class TokenType extends React.Component {
     autoCompleteResult: [],
     EBS: false,
     EBSTYPE: null,
-    SetLoading: false
+    SetLoading: false,
+    symbol: '',
+    lockPeriod: null,
+    NoOfInvestors: null,
+    SecurityToken: null,
+    typeOfSecurity: null,
+    typeOfSecuritysub: null,
+    typeOfSecuritysubsub: null
   };
+
+  componentDidMount() {
+    const search = this.props.location.search;
+    const params = new URLSearchParams(search);
+    const symbol = params.get('symbol');
+    this.setState({ symbol: symbol });
+    if (params.get('edit')) {
+      const db = firebase.firestore();
+      db.collection('reservedTokenSymbols')
+        .doc(symbol + '-' + localStorage.getItem('uid'))
+        .get()
+        .then(snapshot => {
+          if (snapshot.data().TokenType) {
+            this.setState({
+              lockPeriod: snapshot.data().TokenType.LPInvestor,
+              NoOfInvestors: snapshot.data().TokenType.NoOfInvestors,
+              SecurityToken: snapshot.data().TokenType.SecurityToken,
+              typeOfSecurity: snapshot.data().TokenType.typeOfSecurity,
+              typeOfSecuritysub: snapshot.data().TokenType.typeOfSecuritysub,
+              typeOfSecuritysubsub: snapshot.data().TokenType
+                .typeOfSecuritysubsub
+            });
+            if (this.state.typeOfSecurity === 'EBS') {
+              this.setState({ EBS: true });
+            }
+            if (
+              this.state.typeOfSecuritysub === 'CSA' ||
+              this.state.typeOfSecuritysub === 'CSB' ||
+              this.state.typeOfSecuritysub === 'CSC'
+            ) {
+              this.setState({ EBSTYPE: this.state.typeOfSecuritysub });
+            }
+          }
+        });
+    }
+  }
 
   handleSubmit = async e => {
     e.preventDefault();
@@ -31,22 +76,10 @@ class TokenType extends React.Component {
       console.log(values);
       if (!err) {
         this.setState({ SetLoading: true });
-        if (values.typeOfSecurity === 'EBS') {
-          if (
-            values.typeOfSecuritysub === 'CSA' ||
-            values.typeOfSecuritysub === 'CSB' ||
-            values.typeOfSecuritysub === 'CSC'
-          ) {
-            values.typeOfSecurity = values.typeOfSecuritysubsub;
-          } else {
-            values.typeOfSecurity = values.typeOfSecuritysub;
-          }
-        }
         try {
           const search = this.props.location.search; // could be '?foo=bar'
           const params = new URLSearchParams(search);
           const symbol = params.get('symbol'); // bar
-          console.log(symbol);
           const db = firebase.firestore();
           await db
             .collection('reservedTokenSymbols')
@@ -59,7 +92,7 @@ class TokenType extends React.Component {
             description: 'The Token Type and Details are saved.',
             placement: 'topRight'
           });
-          // this.props.NextTab('vesting', res.data.id);
+          this.props.NextTab('vesting');
         } catch (e) {
           console.log(e);
           notification.error({
@@ -118,7 +151,8 @@ class TokenType extends React.Component {
                 required: true,
                 message: 'This field is required'
               }
-            ]
+            ],
+            initialValue: this.state.typeOfSecuritysubsub
           })(
             <Radio.Group
               style={{ textAlign: 'left' }}
@@ -145,7 +179,8 @@ class TokenType extends React.Component {
                 required: true,
                 message: 'This field is required'
               }
-            ]
+            ],
+            initialValue: this.state.typeOfSecuritysub
           })(
             <Radio.Group
               style={{ textAlign: 'left' }}
@@ -214,114 +249,134 @@ class TokenType extends React.Component {
     };
 
     return (
-      <Form {...formItemLayout} onSubmit={this.handleSubmit}>
-        <Form.Item
-          label='Total Number Of Investors'
-          style={{ textAlign: 'left' }}
-        >
-          {getFieldDecorator('NoOfInvestors', {
-            rules: [
-              {
-                required: true,
-                message: 'This field is required!'
-              }
-            ]
-          })(<InputNumber min={1} placeholder='total number of investors' />)}
-        </Form.Item>
-        <Form.Item
-          label={
-            <span>
-              Lock Period For Investor&nbsp;
-              <Tooltip title='Minimum Lock Period is 12 Months'>
-                <Icon type='question-circle-o' />
-              </Tooltip>
-            </span>
-          }
-          style={{ textAlign: 'left' }}
-        >
-          {getFieldDecorator('LPInvestor', {
-            rules: [
-              {
-                required: true,
-                message: 'This field is required'
-              }
-            ]
-          })(<InputNumber min={12} placeholder='lock period for investor' />)}
-        </Form.Item>
-        <Form.Item
-          label={
-            <span style={{ whiteSpace: 'normal' }}>
-              Security Token must be&nbsp;
-              <Tooltip title='So when we say Divisible or Indivisible means "Fractional" or "Whole Number"'>
-                <Icon type='question-circle-o' />
-              </Tooltip>
-            </span>
-          }
-          style={{ textAlign: 'left' }}
-        >
-          {getFieldDecorator('SecurityToken', {
-            rules: [
-              {
-                required: true,
-                message: 'This field is required'
-              }
-            ]
-          })(
-            <Radio.Group style={{ marginRight: '200px' }}>
-              <Radio value={'divisible'}>Divisible</Radio>
-              <Radio value={'indivisible'}>Indivisible</Radio>
-            </Radio.Group>
-          )}
-        </Form.Item>
-        <Form.Item
-          label='Type Of Security'
-          validateStatus='error'
-          style={{ textAlign: 'left' }}
-        >
-          {getFieldDecorator('typeOfSecurity', {
-            rules: [
-              {
-                required: true,
-                message: 'This field is required'
-              }
-            ]
-          })(
-            <Radio.Group
-              style={{ textAlign: 'left' }}
-              onChange={this.onChangeTS}
-            >
-              <Radio value={'EBS'}>Equity Backed Securities</Radio>
-              <br />
-              {this.state.EBS ? this.EquityBasedSecurities() : null}
-              <Radio value={'IPS'}>Interest Paying Securities</Radio>
-              <br />
-              <Radio value={'Convertibles'}>Convertibles</Radio>
-              <br />
-              <Radio value={'warrants'}>Warrants</Radio>
-              <br />
-              <Radio value={'DPS'}>Dividend Paying Securities</Radio>
-              <br />
-              <Radio value={'PS'}>Preferential Securities</Radio>
-              <br />
-              <Radio value={'RET'}>Real Estate Token</Radio>
-              <br />
-            </Radio.Group>
-          )}
-        </Form.Item>
-        <Form.Item {...tailFormItemLayout}>
-          <Button
-            type='primary'
-            htmlType='submit'
-            loading={this.state.SetLoading}
+      <>
+        <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+          <Form.Item
+            label='Total Number Of Investors'
+            style={{ textAlign: 'left' }}
           >
-            Save My Token Type & Token Details
-          </Button>
-        </Form.Item>
-      </Form>
+            {getFieldDecorator('NoOfInvestors', {
+              rules: [
+                {
+                  required: true,
+                  message: 'This field is required!'
+                }
+              ],
+              initialValue: this.state.NoOfInvestors
+            })(<InputNumber min={1} placeholder='total number of investors' />)}
+          </Form.Item>
+          <Form.Item
+            label={
+              <span>
+                Lock Period For Investor&nbsp;
+                <Tooltip title='Minimum Lock Period is 12 Months'>
+                  <Icon type='question-circle-o' />
+                </Tooltip>
+              </span>
+            }
+            style={{ textAlign: 'left' }}
+          >
+            {getFieldDecorator('LPInvestor', {
+              rules: [
+                {
+                  required: true,
+                  message: 'This field is required'
+                }
+              ],
+              initialValue: this.state.lockPeriod
+            })(<InputNumber min={12} placeholder='lock period for investor' />)}
+          </Form.Item>
+          <Form.Item
+            label={
+              <span style={{ whiteSpace: 'normal' }}>
+                Security Token must be&nbsp;
+                <Tooltip title='So when we say Divisible or Indivisible means "Fractional" or "Whole Number"'>
+                  <Icon type='question-circle-o' />
+                </Tooltip>
+              </span>
+            }
+            style={{ textAlign: 'left' }}
+          >
+            {getFieldDecorator('SecurityToken', {
+              rules: [
+                {
+                  required: true,
+                  message: 'This field is required'
+                }
+              ],
+              initialValue: this.state.SecurityToken
+            })(
+              <Radio.Group style={{ marginRight: '200px' }}>
+                <Radio value={'divisible'}>Divisible</Radio>
+                <Radio value={'indivisible'}>Indivisible</Radio>
+              </Radio.Group>
+            )}
+          </Form.Item>
+          <Form.Item
+            label='Type Of Security'
+            validateStatus='error'
+            style={{ textAlign: 'left' }}
+          >
+            {getFieldDecorator('typeOfSecurity', {
+              rules: [
+                {
+                  required: true,
+                  message: 'This field is required'
+                }
+              ],
+              initialValue: this.state.typeOfSecurity
+            })(
+              <Radio.Group
+                style={{ textAlign: 'left' }}
+                onChange={this.onChangeTS}
+              >
+                <Radio value={'EBS'}>Equity Backed Securities</Radio>
+                <br />
+                {this.state.EBS ? this.EquityBasedSecurities() : null}
+                <Radio value={'IPS'}>Interest Paying Securities</Radio>
+                <br />
+                <Radio value={'Convertibles'}>Convertibles</Radio>
+                <br />
+                <Radio value={'warrants'}>Warrants</Radio>
+                <br />
+                <Radio value={'DPS'}>Dividend Paying Securities</Radio>
+                <br />
+                <Radio value={'PS'}>Preferential Securities</Radio>
+                <br />
+                <Radio value={'RET'}>Real Estate Token</Radio>
+                <br />
+              </Radio.Group>
+            )}
+          </Form.Item>
+          <Form.Item {...tailFormItemLayout}>
+            <Button
+              type='primary'
+              htmlType='submit'
+              loading={this.state.SetLoading}
+            >
+              Save My Token Type & Token Details
+            </Button>
+          </Form.Item>
+        </Form>
+        <div style={{ marginTop: '-50px', marginRight: '-60px' }}>
+          <Popconfirm
+            title='Sure to go back to roles without saving?'
+            onConfirm={() => {
+              this.props.history.push(
+                '/issuer/tokenCreation/roles?symbol=' +
+                  this.state.symbol +
+                  '&edit=true'
+              );
+            }}
+          >
+            <Button>Back To Roles</Button>
+          </Popconfirm>
+        </div>
+      </>
     );
   }
 }
 
 const WrappedTokenType = Form.create({ name: 'register' })(TokenType);
 
-export default WrappedTokenType;
+export default withRouter(WrappedTokenType);

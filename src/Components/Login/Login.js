@@ -25,7 +25,7 @@ const NormalLoginForm = props => {
             localStorage.setItem('uid', res.user.uid);
             localStorage.setItem('email', res.user.email);
             if (doc.data().role === 'issuer') {
-              props.history.push('/issuer/tokenCreation/reserve');
+              props.history.push('/issuer/tokens');
             } else {
               props.history.push('/admin/issuerSuperAdmins');
             }

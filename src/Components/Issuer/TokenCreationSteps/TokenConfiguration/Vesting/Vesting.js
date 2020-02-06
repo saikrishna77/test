@@ -14,6 +14,8 @@ import {
 } from 'antd';
 import axios from 'axios';
 import api_url from '../../../../../api_url';
+import firebase from '../../../../../utils/firebase';
+import { withRouter } from 'react-router-dom';
 
 const Vesting = props => {
   // console.log(props.TokenID);
@@ -66,7 +68,7 @@ const Vesting = props => {
     } else if (!vestingName) {
       setErrMsg('Give the vesting a name, dugh!');
       setSetError(true);
-    } else if (vestingName && vestingName.toString().length() < 1) {
+    } else if (vestingName && vestingName.toString().length < 1) {
       setErrMsg('Give the vesting a name, dugh!');
       setSetError(true);
     } else if (!vestingMonths) {
@@ -214,14 +216,20 @@ const Vesting = props => {
       onOk() {
         setSetNextModal(false);
         setLoading(true);
-        const payload = {
-          totalVestingMonths: vestingMonths,
-          vestingName: vestingName.toString().replace(/ +/g, ''),
-          firebaseTokenID: props.TokenID,
-          data: data
-        };
-        axios
-          .post(api_url + 'vestingSchedule', payload)
+        const search = props.location.search;
+        const params = new URLSearchParams(search);
+        const symbol = params.get('symbol');
+        console.log(symbol);
+        const db = firebase.firestore();
+        db.collection('reservedTokenSymbols')
+          .doc(symbol + '-' + localStorage.getItem('uid'))
+          .update({
+            ['vestingSchedules.' + vestingName]: {
+              totalVestingMonths: vestingMonths,
+              vestingName: vestingName,
+              data: data
+            }
+          })
           .then(res => {
             notification.success({
               message: `Vesting Schedule Added`,
@@ -245,14 +253,22 @@ const Vesting = props => {
         console.log(data);
         console.log('vestingMonths: ' + vestingMonths);
         console.log('vestingName: ' + vestingName);
-        const payload = {
-          totalVestingMonths: vestingMonths,
-          vestingName: vestingName.toString(),
-          firebaseTokenID: props.TokenID,
-          data: data
-        };
-        axios
-          .post(api_url + 'vestingSchedule', payload)
+        const search = props.location.search;
+        const params = new URLSearchParams(search);
+        const symbol = params.get('symbol');
+        console.log(symbol);
+        const db = firebase.firestore();
+        db.collection('reservedTokenSymbols')
+          .doc(symbol + '-' + localStorage.getItem('uid'))
+          .update({
+            vestingSchedules: {
+              [vestingName]: {
+                totalVestingMonths: vestingMonths,
+                vestingName: vestingName,
+                data: data
+              }
+            }
+          })
           .then(res => {
             notification.success({
               message: `Vesting Schedule Added`,
@@ -493,4 +509,4 @@ const Vesting = props => {
   );
 };
 
-export default Vesting;
+export default withRouter(Vesting);

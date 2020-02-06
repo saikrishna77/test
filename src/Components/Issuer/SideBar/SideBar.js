@@ -65,11 +65,16 @@ const UserSideBar = props => {
           }}
           theme='dark'
           mode='inline'
-          defaultSelectedKeys={['2']}
+          defaultSelectedKeys={['1']}
         >
-          <Menu.Item key='1'>
-            <Icon type='user' />
-            <span className='nav-text'>DashBoard</span>
+          <Menu.Item
+            key='1'
+            onClick={() => {
+              props.history.push('/issuer/tokens');
+            }}
+          >
+            <Icon type='setting' />
+            <span className='nav-text'>Tokens</span>
           </Menu.Item>
           <Menu.Item
             key='2'
@@ -82,15 +87,6 @@ const UserSideBar = props => {
           </Menu.Item>
           <Menu.Item
             key='3'
-            onClick={() => {
-              props.history.push('/issuer/tokens');
-            }}
-          >
-            <Icon type='setting' />
-            <span className='nav-text'>Tokens</span>
-          </Menu.Item>
-          <Menu.Item
-            key='4'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}
           >
