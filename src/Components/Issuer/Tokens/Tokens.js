@@ -13,7 +13,7 @@ const Tokens = props => {
         const db = firebase.firestore();
         const tokenRef = db.collection('reservedTokenSymbols');
         tokenRef
-          .where('basicDetails.issuer', '==', localStorage.getItem('uid'))
+          .where('basicDetails.issuer', '==', user.uid)
           .get()
           .then(snapshot => {
             if (snapshot.empty) {
