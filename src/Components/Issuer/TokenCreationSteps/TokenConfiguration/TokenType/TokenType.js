@@ -10,7 +10,7 @@ import {
   Icon,
   notification
 } from 'antd';
-import firebase from '../../../../../utils/Firebase/firebase';
+import firebase from '../../../../../utils/firebase';
 
 class TokenType extends React.Component {
   state = {

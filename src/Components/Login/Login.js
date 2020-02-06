@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Icon, Input, Button, Checkbox, Card } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
-import firebase from '../../utils/Firebase/firebase';
+import firebase from '../../utils/firebase';
 
 const NormalLoginForm = props => {
   const handleSubmit = e => {

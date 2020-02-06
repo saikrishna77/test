@@ -1,6 +1,6 @@
 import { Layout, Menu, Icon, Typography } from 'antd';
 import React from 'react';
-import firebase from '../../../utils/Firebase/firebase';
+import firebase from '../../../utils/firebase';
 import { withRouter } from 'react-router-dom';
 const { Text } = Typography;
 

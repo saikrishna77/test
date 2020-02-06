@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { MetamaskService } from '../../utils/metamask';
-import firebase from '../../utils/Firebase/firebase';
+import firebase from '../../utils/firebase';
 
 class RegistrationForm extends React.Component {
   state = {

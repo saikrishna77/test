@@ -24,15 +24,9 @@ function App() {
   };
   return (
     <div className='App'>
-      {/* <div style={{ position: 'absolute', height: '100vh' }}>
-        <SideBar />
-      </div> */}
-      {/* <FirebaseContext.Provider value={new Firebase()}> */}
       <Switch>
         <Route exact path='/register' component={RegisterFormComp}></Route>
         <Route exact path='/login' component={LoginForm}></Route>
-        {/* <Route exact path='/' component={TokenConfigComp}></Route> */}
-        {/* <Route exact path='/reserveToken' component={ReserveToken}></Route> */}
         <Route
           exact
           path='/admin/issuerSuperAdmins'
@@ -80,7 +74,6 @@ function App() {
           )}
         ></Route>
       </Switch>
-      {/* </FirebaseContext.Provider> */}
     </div>
   );
 }

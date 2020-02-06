@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Card, Input, Button, Modal } from 'antd';
 import Reserve from './Reserve';
 import Reserved from './Reserved';
-import firebase from '../../../../utils/Firebase/firebase';
+import firebase from '../../../../utils/firebase';
 
 const ReserveToken = props => {
   const [selectedWallet, setSelectedWallet] = React.useState('');

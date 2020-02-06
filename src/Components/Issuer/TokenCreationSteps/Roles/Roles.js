@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Button, Select, Input, Popconfirm } from 'antd';
 import { withRouter } from 'react-router-dom';
-import firebase from '../../../../utils/Firebase/firebase';
+import firebase from '../../../../utils/firebase';
 
 const Roles = props => {
   const [data, setData] = React.useState([]);
