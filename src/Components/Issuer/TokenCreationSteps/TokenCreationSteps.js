@@ -12,11 +12,11 @@ const TokenCreationSteps = props => {
 
   React.useEffect(() => {
     setStepType(props.match.params.stepType);
-  });
+  }, [props.match.params.stepType]);
 
-  const stepOnClick = e => {
-    props.history.push('/issuer/tokenCreation/' + e);
-  };
+  // const stepOnClick = e => {
+  //   props.history.push('/issuer/tokenCreation/' + e);
+  // };
 
   console.log(props.match.params.stepNo);
   return (
@@ -30,23 +30,23 @@ const TokenCreationSteps = props => {
                 stepType === 'tokenConfig' ||
                 stepType === 'reserve'
               }
-              onClick={() => stepOnClick('reserve')}
+              // onClick={() => stepOnClick('reserve')}
               title='Reserve Token Symbol'
-              style={{ cursor: 'pointer' }}
+              // style={{ cursor: 'pointer' }}
               icon={<Icon type='safety' />}
             />
             <Step
               status={stepType === 'roles' || stepType === 'tokenConfig'}
               title='Add Roles'
-              style={{ cursor: 'pointer' }}
-              onClick={() => stepOnClick('roles')}
+              // style={{ cursor: 'pointer' }}
+              // onClick={() => stepOnClick('roles')}
               icon={<Icon type='solution' />}
             />
             <Step
               status={stepType === 'tokenConfig'}
               title='Token Configuration'
-              style={{ cursor: 'pointer' }}
-              onClick={() => stepOnClick('tokenConfig')}
+              // style={{ cursor: 'pointer' }}
+              // onClick={() => stepOnClick('tokenConfig')}
               icon={<Icon type='edit' />}
             />
             {/* <Step status='wait' title='Done' icon={<Icon type='smile-o' />} /> */}

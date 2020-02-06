@@ -19,7 +19,7 @@ const Tokens = props => {
         }
         let tempData = [];
         snapshot.forEach(doc => {
-          tempData.push(doc.data());
+          tempData.push({ ...doc.data(), id: doc.id });
           console.log(doc.id, '=>', doc.data());
         });
         setData(tempData);
@@ -34,7 +34,7 @@ const Tokens = props => {
     for (let i = 0; i < data.length; i++) {
       let temp;
       temp = (
-        <Col span={8}>
+        <Col span={8} key='i'>
           <Card
             title={data[i].basicDetails.symbol}
             style={{
@@ -62,7 +62,18 @@ const Tokens = props => {
                 data[i].basicDetails.symbolCreationTime
               ).toLocaleDateString()}{' '}
             </p>
-            <Button type='primary'>Configure</Button>
+            <Button
+              type='primary'
+              onClick={() => {
+                props.history.push(
+                  '/issuer/tokenCreation/roles?symbol=' +
+                    data[i].basicDetails.symbol +
+                    '&edit=true'
+                );
+              }}
+            >
+              Configure
+            </Button>
           </Card>
         </Col>
       );
@@ -71,11 +82,7 @@ const Tokens = props => {
     return <Row gutter={[16, 26]}>{cardsArr}</Row>;
   };
 
-  return (
-    <div style={{ marginLeft: '80px' }}>
-      {RenderCards()}
-    </div>
-  );
+  return <div style={{ marginLeft: '80px' }}>{RenderCards()}</div>;
 };
 
 export default withRouter(Tokens);

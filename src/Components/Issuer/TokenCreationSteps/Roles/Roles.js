@@ -6,14 +6,28 @@ import firebase from '../../../../utils/firebase';
 const Roles = props => {
   const [data, setData] = React.useState([]);
   React.useEffect(() => {
-    setData([
-      {
-        key: 1,
-        name: 'Role 1',
-        roleType: 'Employee',
-        role: 'Manager'
-      }
-    ]);
+    const search = props.location.search;
+    const params = new URLSearchParams(search);
+    const symbol = params.get('symbol');
+    if (params.get('edit')) {
+      const db = firebase.firestore();
+      db.collection('reservedTokenSymbols')
+        .doc(symbol + '-' + localStorage.getItem('uid'))
+        .get()
+        .then(snapshot => {
+          console.log(snapshot.data());
+          setData(snapshot.data().roles);
+        });
+    } else {
+      setData([
+        {
+          key: 1,
+          name: 'Role 1',
+          roleType: 'Employee',
+          role: 'Manager'
+        }
+      ]);
+    }
   }, []);
 
   const handleAdd = () => {
@@ -29,9 +43,9 @@ const Roles = props => {
   };
 
   const handleSubmit = async () => {
-    const search = props.location.search; // could be '?foo=bar'
+    const search = props.location.search;
     const params = new URLSearchParams(search);
-    const symbol = params.get('symbol'); // bar
+    const symbol = params.get('symbol');
     console.log(symbol);
     const db = firebase.firestore();
     await db
@@ -40,7 +54,13 @@ const Roles = props => {
       .update({
         roles: data
       });
-    props.history.push('/issuer/tokenCreation/tokenConfig?symbol=' + symbol);
+    if (params.get('edit')) {
+      props.history.push(
+        '/issuer/tokenCreation/tokenConfig?symbol=' + symbol + '&edit=true'
+      );
+    } else {
+      props.history.push('/issuer/tokenCreation/tokenConfig?symbol=' + symbol);
+    }
   };
 
   const handleDeleteRow = key => {

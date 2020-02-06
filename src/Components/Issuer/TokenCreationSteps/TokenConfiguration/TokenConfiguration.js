@@ -1,4 +1,4 @@
-import { Menu, Card, Button } from 'antd';
+import { Menu, Card } from 'antd';
 import React from 'react';
 import TokenType from './TokenType/TokenType';
 import { Row, Icon } from 'antd';
