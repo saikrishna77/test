@@ -11,6 +11,7 @@ const NormalLoginForm = props => {
     props.form.validateFields(async (err, values) => {
       if (!err) {
         try {
+          values.username = values.username.trim();
           setLoading(true);
           let res = await firebase
             .auth()
