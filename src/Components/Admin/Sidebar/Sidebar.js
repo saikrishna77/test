@@ -1,12 +1,16 @@
-import { Layout, Menu, Icon, Typography, Input } from 'antd';
+import { Layout, Menu, Icon, Typography } from 'antd';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import firebase from '../../../utils/firebase';
 const { SubMenu } = Menu;
 const { Text } = Typography;
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Sider } = Layout;
 const AdminSideBar = props => {
-  console.log(props);
+  const logout = () => {
+    firebase.auth().signOut();
+    props.history.push('/login');
+  };
   return (
     <Layout>
       <Header
@@ -90,6 +94,14 @@ const AdminSideBar = props => {
             </Menu.Item>
             <Menu.Item key='3'>Verification Requests</Menu.Item>
           </SubMenu>
+          <Menu.Item
+            key='3'
+            style={{ position: 'absolute', marginTop: '86vh' }}
+            onClick={logout}
+          >
+            <Icon type='logout' />
+            <span className='nav-text'>Logout</span>
+          </Menu.Item>
         </Menu>
       </Sider>
     </Layout>

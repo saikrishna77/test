@@ -8,8 +8,7 @@ const AllRequests = props => {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
-    setLoading(true);
+  const fetchData = () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
         const db = firebase.firestore();
@@ -19,6 +18,7 @@ const AllRequests = props => {
           .get()
           .then(snapshot => {
             if (snapshot.empty) {
+              setLoading(false);
               console.log('No matching documents.');
               return;
             }
@@ -54,7 +54,13 @@ const AllRequests = props => {
         props.history.push('/login');
       }
     });
-  }, [props.history]);
+  };
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { Column } = Table;
 

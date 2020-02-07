@@ -10,8 +10,7 @@ const PendingRequests = props => {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
-    setLoading(true);
+  const fetchData = () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
         const db = firebase.firestore();
@@ -22,6 +21,7 @@ const PendingRequests = props => {
           .get()
           .then(snapshot => {
             if (snapshot.empty) {
+              setLoading(false);
               console.log('No matching documents.');
               return;
             }
@@ -42,7 +42,8 @@ const PendingRequests = props => {
                 createdOn: new Date(
                   doc.data().userRegisterTimeStamp
                 ).toLocaleString(),
-                key: i
+                key: i,
+                id: doc.id
               });
               console.log(
                 new Date(doc.data().userRegisterTimeStamp).toLocaleDateString()
@@ -59,10 +60,33 @@ const PendingRequests = props => {
         props.history.push('/login');
       }
     });
-  }, [props.history]);
+  };
+  React.useEffect(() => {
+    setLoading(true);
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const showDetails = record => {
     Details(record);
+  };
+
+  const accept = record => {
+    setLoading(true);
+    const db = firebase.firestore();
+    const ref = db.collection('users').doc(record.id);
+    ref.update({ 'status.adminApproved': 'approved' });
+    setData();
+    fetchData();
+  };
+
+  const reject = record => {
+    setLoading(true);
+    const db = firebase.firestore();
+    const ref = db.collection('users').doc(record.id);
+    // ref.update({ 'status.adminApproved': 'rejected' });
+    setData();
+    fetchData();
   };
 
   return (
@@ -80,9 +104,9 @@ const PendingRequests = props => {
           key='action'
           render={(text, record) => (
             <span>
-              <a>Accept</a>
+              <a onClick={() => accept(record)}>Accept</a>
               <Divider type='vertical' />
-              <a>Reject</a>
+              <a onClick={() => reject(record)}>Reject</a>
               <Divider type='vertical' />
               <a onClick={() => showDetails(record)}>Details</a>
             </span>
