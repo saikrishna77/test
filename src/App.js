@@ -33,13 +33,38 @@ function App(props) {
                 } else {
                   props.history.push('/issuer/tokens');
                 }
-              } else {
+              } else if (doc.data().role === 'admin') {
                 props.history.push('/admin/registrationRequests');
               }
             } else {
-              props.history.push(
-                window.location.pathname + props.location.search
-              );
+              const subRoute = window.location.pathname
+                .toString()
+                .split('/')[1];
+              if (subRoute === 'issuer') {
+                if (doc.data().role === 'issuer') {
+                  if (doc.data().status.adminApproved !== 'approved') {
+                    props.history.push('/pendingRegistrationError');
+                  } else {
+                    props.history.push(
+                      window.location.pathname + props.location.search
+                    );
+                  }
+                } else {
+                  props.history.push('/login');
+                }
+              } else if (subRoute === 'admin') {
+                if (doc.data().role === 'admin') {
+                  props.history.push(
+                    window.location.pathname + props.location.search
+                  );
+                } else {
+                  props.history.push('/login');
+                }
+              } else {
+                props.history.push(
+                  window.location.pathname + props.location.search
+                );
+              }
             }
             console.log('Document data:', doc.data());
           }
