@@ -48,7 +48,11 @@ class RegistrationForm extends React.Component {
                   underlyingAsset: values.UnderlyingAsset,
                   tentativeDate: values.tentativeDate,
                   role: 'issuer',
-                  userRegisterTimeStamp: Date.now()
+                  userRegisterTimeStamp: Date.now(),
+                  flag: true,
+                  status: {
+                    adminApproved: 'pending'
+                  }
                 });
               this.props.history.push('/issuer/tokenCreation/reserve');
             })

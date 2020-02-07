@@ -30,7 +30,8 @@ function App(props) {
           } else {
             console.log(window.location.pathname);
             if (window.location.pathname === '/') {
-              if (doc.data().role === 'issuer') {
+              // if (doc.data().role === 'issuer') {
+              if (false) {
                 props.history.push('/issuer/tokens');
               } else {
                 props.history.push('/admin/issuerSuperAdmins');
