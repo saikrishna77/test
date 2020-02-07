@@ -19,20 +19,29 @@ function App(props) {
   React.useEffect(() => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
-        const db = firebase.firestore();
-        const doc = await db
-          .collection('users')
-          .doc(user.uid)
-          .get();
-        if (!doc.exists) {
-          console.log('No such document!');
-        } else {
-          if (doc.data().role === 'issuer') {
-            props.history.push('/issuer/tokens');
+        if (user.emailVerified) {
+          const db = firebase.firestore();
+          const doc = await db
+            .collection('users')
+            .doc(user.uid)
+            .get();
+          if (!doc.exists) {
+            console.log('No such document!');
           } else {
-            props.history.push('/admin/issuerSuperAdmins');
+            console.log(window.location.pathname);
+            if (window.location.pathname === '/') {
+              if (doc.data().role === 'issuer') {
+                props.history.push('/issuer/tokens');
+              } else {
+                props.history.push('/admin/issuerSuperAdmins');
+              }
+            } else {
+              props.history.push(
+                window.location.pathname + props.location.search
+              );
+            }
+            console.log('Document data:', doc.data());
           }
-          console.log('Document data:', doc.data());
         }
       } else {
         props.history.push('/login');

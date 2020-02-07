@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Icon, Input, Button, Checkbox, Card } from 'antd';
+import { Form, Icon, Input, Button, Card, message } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../utils/firebase';
 
@@ -16,24 +16,46 @@ const NormalLoginForm = props => {
           let res = await firebase
             .auth()
             .signInWithEmailAndPassword(values.username, values.password);
-          console.log('Received values of form: ', values);
-          console.log(res.user.uid);
-          const db = firebase.firestore();
-          const doc = await db
-            .collection('users')
-            .doc(res.user.uid)
-            .get();
-          if (!doc.exists) {
-            console.log('No such document!');
-          } else {
-            localStorage.setItem('uid', res.user.uid);
-            localStorage.setItem('email', res.user.email);
-            if (doc.data().role === 'issuer') {
-              props.history.push('/issuer/tokens');
+          console.log(res.user);
+          if (res.user.emailVerified) {
+            console.log(res.user.emailVerified);
+            console.log('email verified');
+            const db = firebase.firestore();
+            const doc = await db
+              .collection('users')
+              .doc(res.user.uid)
+              .get();
+            if (!doc.exists) {
+              console.log('No such document!');
             } else {
-              props.history.push('/admin/issuerSuperAdmins');
+              localStorage.setItem('uid', res.user.uid);
+              localStorage.setItem('email', res.user.email);
+              if (doc.data().role === 'issuer') {
+                props.history.push('/issuer/tokens');
+              } else {
+                props.history.push('/admin/issuerSuperAdmins');
+              }
+              console.log('Document data:', doc.data());
             }
-            console.log('Document data:', doc.data());
+          } else {
+            console.log('email not verified');
+            firebase.auth().onAuthStateChanged(async function(user) {
+              if (user) {
+                user
+                  .sendEmailVerification()
+                  .then(() => {
+                    message.error(
+                      'Email not verified, link sent to your email.'
+                    );
+                  })
+                  .catch(e => {
+                    console.log(e);
+                    message.error(
+                      'Email not verified, problem sending email try again later'
+                    );
+                  });
+              }
+            });
           }
           setLoading(false);
         } catch (e) {
