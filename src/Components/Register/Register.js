@@ -2,12 +2,7 @@ import React from 'react';
 import {
   Form,
   Input,
-  Select,
-  Row,
-  Col,
-  Checkbox,
   Button,
-  AutoComplete,
   Card,
   Modal
 } from 'antd';

@@ -558,6 +558,13 @@ const Vesting = props => {
           pagination={false}
         />
         <div style={{ marginTop: '20px' }}>
+          {displayVesting > 100 ? (
+            <div style={{ color: 'red' }}>
+              The total vesting percentage exceded 100% fix that.
+            </div>
+          ) : (
+            ''
+          )}
           <b>Total Percent Vesting: {displayVesting}%</b>
         </div>
         <div style={{ textAlign: 'right' }}>
