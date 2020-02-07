@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Form,
-  Input,
-  Button,
-  Card,
-  Modal
-} from 'antd';
+import { Form, Input, Button, Card, Modal } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { MetamaskService } from '../../utils/metamask';
 import firebase from '../../utils/firebase';
@@ -32,36 +26,36 @@ class RegistrationForm extends React.Component {
               DisplayErrorOkClicked();
             }
           });
+        } else {
+          firebase
+            .auth()
+            .createUserWithEmailAndPassword(values.email, values.password)
+            .then(async res => {
+              const db = firebase.firestore();
+              localStorage.setItem('uid', res.user.uid);
+              localStorage.setItem('email', res.user.email);
+              await db
+                .collection('users')
+                .doc(res.user.uid)
+                .set({
+                  uid: res.user.uid,
+                  email: res.user.email,
+                  firstName: values.firstname,
+                  lastName: values.lastname,
+                  phone: values.phone,
+                  tokenphase: values.tokenphase,
+                  amount: values.amount,
+                  underlyingAsset: values.UnderlyingAsset,
+                  tentativeDate: values.tentativeDate,
+                  role: 'issuer',
+                  userRegisterTimeStamp: Date.now()
+                });
+              this.props.history.push('/issuer/tokenCreation/reserve');
+            })
+            .catch(error => {
+              console.log(error);
+            });
         }
-        firebase
-          .auth()
-          .createUserWithEmailAndPassword(values.email, values.password)
-          .then(async res => {
-            const db = firebase.firestore();
-            localStorage.setItem('uid', res.user.uid);
-            localStorage.setItem('email', res.user.email);
-            await db
-              .collection('users')
-              .doc(res.user.uid)
-              .set({
-                uid: res.user.uid,
-                email: res.user.email,
-                firstName: values.firstname,
-                lastName: values.lastname,
-                phone: values.phone,
-                tokenphase: values.tokenphase,
-                amount: values.amount,
-                underlyingAsset: values.UnderlyingAsset,
-                tentativeDate: values.tentativeDate,
-                role: 'issuer',
-                userRegisterTimeStamp: Date.now()
-              });
-            this.props.history.push('/issuer/tokenCreation/reserve');
-          })
-          .catch(error => {
-            console.log(error);
-          });
-
         console.log('Received values of form: ', values);
       }
     });
