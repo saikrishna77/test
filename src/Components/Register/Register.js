@@ -43,6 +43,8 @@ class RegistrationForm extends React.Component {
           .createUserWithEmailAndPassword(values.email, values.password)
           .then(async res => {
             const db = firebase.firestore();
+            localStorage.setItem('uid', res.user.uid);
+            localStorage.setItem('email', res.user.email);
             await db
               .collection('users')
               .doc(res.user.uid)
