@@ -20,7 +20,7 @@ const TokenCreationSteps = props => {
 
   console.log(props.match.params.stepNo);
   return (
-    <div style={{ width: '60%', marginLeft: '20%', marginTop: '2%' }}>
+    <div style={{ width: '80%', marginLeft: '10%', marginTop: '2%' }}>
       <Card>
         <div style={{ marginRight: '10%' }}>
           <Steps>

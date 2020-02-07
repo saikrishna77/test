@@ -29,6 +29,32 @@ const Vesting = props => {
   const [setNextModal, setSetNextModal] = React.useState(false);
   const [scheduleNames, setScheduleNames] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [editMode, setEditMode] = React.useState(false);
+  const [editVestingNames, setEditVestingNames] = React.useState([]);
+  const [editData, setEditData] = React.useState();
+
+  React.useEffect(() => {
+    const search = props.location.search;
+    const params = new URLSearchParams(search);
+    const symbol = params.get('symbol');
+    if (params.get('edit')) {
+      setEditMode(true);
+      const db = firebase.firestore();
+      db.collection('reservedTokenSymbols')
+        .doc(symbol + '-' + localStorage.getItem('uid'))
+        .get()
+        .then(snapshot => {
+          console.log(snapshot.data().vestingSchedules);
+          const arr = [];
+          for (const key in snapshot.data().vestingSchedules) {
+            arr.push(<Select.Option value={key}>{key}</Select.Option>);
+          }
+          console.log(arr);
+          setEditVestingNames(arr);
+          setEditData(snapshot.data().vestingSchedules);
+        });
+    }
+  }, [props.location.search]);
 
   const onSubmit = () => {
     let flag = false;
@@ -52,6 +78,10 @@ const Vesting = props => {
       setSetError(true);
     } else if (lockFlag) {
       setErrMsg(`check the lock period for all entries.`);
+      setSetError(true);
+    } else if (!new RegExp('^[^~*/[]]*$').test(vestingName)) {
+      //'~', '*', '/', '[', or ']'
+      setErrMsg(`vesting name Shound not contain ~ * / [ or ]`);
       setSetError(true);
     } else if (nameFlag) {
       setErrMsg(`Dont use the same vesting name twice bro!`);
@@ -152,6 +182,14 @@ const Vesting = props => {
     let tempData = [...data];
     tempData[record.key - 1].FD = value;
     setData(tempData);
+  };
+
+  const editVestingNameChange = e => {
+    console.log(e);
+    console.log(editData['first']);
+    setData(editData[e].data);
+    setVestingMonths(editData[e].totalVestingMonths);
+    setVestingName(editData[e].vestingName);
   };
 
   const onChangeVestPres = (e, record) => {
@@ -258,33 +296,62 @@ const Vesting = props => {
         const symbol = params.get('symbol');
         console.log(symbol);
         const db = firebase.firestore();
-        db.collection('reservedTokenSymbols')
-          .doc(symbol + '-' + localStorage.getItem('uid'))
-          .update({
-            vestingSchedules: {
-              [vestingName]: {
+        if (editMode) {
+          db.collection('reservedTokenSymbols')
+            .doc(symbol + '-' + localStorage.getItem('uid'))
+            .update({
+              ['vestingSchedules.' + vestingName]: {
                 totalVestingMonths: vestingMonths,
                 vestingName: vestingName,
                 data: data
               }
-            }
-          })
-          .then(res => {
-            notification.success({
-              message: `Vesting Schedule Added`,
-              description: `Your vesting schedule with name ${vestingName} has been saved`,
-              placement: 'topRight'
+            })
+            .then(res => {
+              notification.success({
+                message: `Vesting Schedule Added`,
+                description: `Your vesting schedule with name ${vestingName} has been saved`,
+                placement: 'topRight'
+              });
+              setLoading(false);
+              props.NextTab('phase');
+            })
+            .catch(err => {
+              notification.error({
+                message: 'saving failed',
+                description: `Problem saving ${vestingName}`,
+                placement: 'topRight'
+              });
+              setLoading(false);
             });
-            setLoading(false);
-          })
-          .catch(err => {
-            notification.error({
-              message: 'saving failed',
-              description: `Problem saving ${vestingName}`,
-              placement: 'topRight'
+        } else {
+          db.collection('reservedTokenSymbols')
+            .doc(symbol + '-' + localStorage.getItem('uid'))
+            .update({
+              vestingSchedules: {
+                [vestingName]: {
+                  totalVestingMonths: vestingMonths,
+                  vestingName: vestingName,
+                  data: data
+                }
+              }
+            })
+            .then(res => {
+              notification.success({
+                message: `Vesting Schedule Added`,
+                description: `Your vesting schedule with name ${vestingName} has been saved`,
+                placement: 'topRight'
+              });
+              setLoading(false);
+            })
+            .catch(err => {
+              notification.error({
+                message: 'saving failed',
+                description: `Problem saving ${vestingName}`,
+                placement: 'topRight'
+              });
+              setLoading(false);
             });
-            setLoading(false);
-          });
+        }
         clearToAddNewVest();
         console.log('Add');
       }
@@ -425,6 +492,15 @@ const Vesting = props => {
     <div>
       {setError ? DisplayError() : null}
       {setNextModal ? DisplaySuccess() : null}
+      {editMode ? (
+        <>
+          <b>Select a vesting to edit</b>
+          <Select style={{ width: '190px' }} onChange={editVestingNameChange}>
+            {editVestingNames}
+          </Select>
+          <br />
+        </>
+      ) : null}
       <b>* Enter the Name for Vesting Schedule</b>
       <br />
       <Input
