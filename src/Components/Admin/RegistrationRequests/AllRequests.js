@@ -31,6 +31,15 @@ const AllRequests = props => {
                 lastName: doc.data().lastName,
                 email: doc.data().email,
                 status: doc.data().status.adminApproved,
+                company: doc.data().company,
+                phone: doc.data().phone,
+                tokenPhase: doc.data().tokenphase,
+                amountToRaise: doc.data().amount,
+                underlyingAsset: doc.data().underlyingAsset,
+                tentativeDate: doc.data().tentativeDate,
+                createdOn: new Date(
+                  doc.data().userRegisterTimeStamp
+                ).toLocaleString(),
                 key: i
               });
             });
@@ -50,7 +59,7 @@ const AllRequests = props => {
   const { Column } = Table;
 
   const showDetails = record => {
-    Details();
+    Details(record);
   };
 
   return (

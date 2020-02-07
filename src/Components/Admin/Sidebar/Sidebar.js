@@ -64,7 +64,7 @@ const AdminSideBar = props => {
           }}
           theme='dark'
           mode='inline'
-          defaultSelectedKeys={['1']}
+          defaultSelectedKeys={['2']}
         >
           <Menu.Item
             key='1'

@@ -1,6 +1,8 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Table, Card, Divider } from 'antd';
 import { withRouter } from 'react-router-dom';
+import Details from './Details';
 import firebase from '../../../utils/firebase';
 
 const PendingRequests = props => {
@@ -31,7 +33,12 @@ const PendingRequests = props => {
                 firstName: doc.data().firstName,
                 lastName: doc.data().lastName,
                 email: doc.data().email,
+                company: doc.data().company,
                 phone: doc.data().phone,
+                tokenPhase: doc.data().tokenphase,
+                amountToRaise: doc.data().amount,
+                underlyingAsset: doc.data().underlyingAsset,
+                tentativeDate: doc.data().tentativeDate,
                 createdOn: new Date(
                   doc.data().userRegisterTimeStamp
                 ).toLocaleString(),
@@ -54,6 +61,10 @@ const PendingRequests = props => {
     });
   }, [props.history]);
 
+  const showDetails = record => {
+    Details(record);
+  };
+
   return (
     <Card style={{ margin: 'auto', marginTop: '4%' }}>
       <Table dataSource={data} pagination={false} loading={loading}>
@@ -72,6 +83,8 @@ const PendingRequests = props => {
               <a>Accept</a>
               <Divider type='vertical' />
               <a>Reject</a>
+              <Divider type='vertical' />
+              <a onClick={() => showDetails(record)}>Details</a>
             </span>
           )}
         />

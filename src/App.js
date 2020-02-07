@@ -1,13 +1,9 @@
 import React from 'react';
 import './App.css';
-import TokenConfig from './Components/Issuer/TokenCreationSteps/TokenConfiguration/TokenConfiguration';
-import { Row } from 'antd';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import RegisterForm from './Components/Register/Register';
 import LoginForm from './Components/Login/Login';
-import ReserveToken from './Components/Issuer/TokenCreationSteps/ReserveToken/ReserveToken';
 import TokenCreationSteps from './Components/Issuer/TokenCreationSteps/TokenCreationSteps';
-// import UserSideBar from './Components/SideBar/SideBar';
 import IssuerSuperAdmins from './Components/Admin/IssuerSuperAdmins/IssuerSuperAdmins';
 import RegistrationRequest from './Components/Admin/RegistrationRequests/RegistrationRequests';
 import SideBar from './Components/Admin/Sidebar/Sidebar';
@@ -34,7 +30,7 @@ function App(props) {
               if (false) {
                 props.history.push('/issuer/tokens');
               } else {
-                props.history.push('/admin/issuerSuperAdmins');
+                props.history.push('/admin/registrationRequests');
               }
             } else {
               props.history.push(
