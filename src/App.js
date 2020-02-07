@@ -10,6 +10,7 @@ import SideBar from './Components/Admin/Sidebar/Sidebar';
 import IssuerSideBar from './Components/Issuer/SideBar/SideBar';
 import Tokens from './Components/Issuer/Tokens/Tokens';
 import firebase from './utils/firebase';
+import ErrorPage from './Components/Issuer/ErrorPage/ErrorPage';
 
 function App(props) {
   React.useEffect(() => {
@@ -27,8 +28,11 @@ function App(props) {
             console.log(window.location.pathname);
             if (window.location.pathname === '/') {
               if (doc.data().role === 'issuer') {
-                // if (false) {
-                props.history.push('/issuer/tokens');
+                if (doc.data().status.adminApproved !== 'approved') {
+                  props.history.push('/pendingRegistrationError');
+                } else {
+                  props.history.push('/issuer/tokens');
+                }
               } else {
                 props.history.push('/admin/registrationRequests');
               }
@@ -57,6 +61,11 @@ function App(props) {
       <Switch>
         <Route exact path='/register' component={RegisterFormComp}></Route>
         <Route exact path='/login' component={LoginForm}></Route>
+        <Route
+          exact
+          path='/pendingRegistrationError'
+          component={ErrorPage}
+        ></Route>
         <Route
           exact
           path='/admin/issuerSuperAdmins'

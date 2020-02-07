@@ -54,7 +54,7 @@ class RegistrationForm extends React.Component {
                     adminApproved: 'pending'
                   }
                 });
-              this.props.history.push('/issuer/tokenCreation/reserve');
+              this.props.history.push('/pendingRegistrationError');
             })
             .catch(error => {
               console.log(error);

@@ -31,9 +31,13 @@ const NormalLoginForm = props => {
               localStorage.setItem('uid', res.user.uid);
               localStorage.setItem('email', res.user.email);
               if (doc.data().role === 'issuer') {
-                props.history.push('/issuer/tokens');
+                if (doc.data().status.adminApproved !== 'approved') {
+                  props.history.push('/pendingRegistrationError');
+                } else {
+                  props.history.push('/issuer/tokens');
+                }
               } else {
-                props.history.push('/admin/issuerSuperAdmins');
+                props.history.push('/admin/registrationRequests');
               }
               console.log('Document data:', doc.data());
             }
