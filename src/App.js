@@ -11,6 +11,7 @@ import IssuerSideBar from './Components/Issuer/SideBar/SideBar';
 import Tokens from './Components/Issuer/Tokens/Tokens';
 import firebase from './utils/firebase';
 import ErrorPage from './Components/Issuer/ErrorPage/ErrorPage';
+import IssuerReg from './Components/Issuer/IssuerReg/issuerReg';
 
 function App(props) {
   React.useEffect(() => {
@@ -133,6 +134,17 @@ function App(props) {
               <IssuerSideBar />
               <div style={{ marginTop: '6%', marginLeft: '10%' }}>
                 <Tokens />
+              </div>
+            </>
+          )}
+        ></Route>
+        <Route
+          path='/issuer/issuerReg'
+          render={props => (
+            <>
+              <IssuerSideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <IssuerReg />
               </div>
             </>
           )}

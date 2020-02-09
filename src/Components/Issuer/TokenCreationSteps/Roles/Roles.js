@@ -5,6 +5,57 @@ import firebase from '../../../../utils/firebase';
 
 const Roles = props => {
   const [data, setData] = React.useState([]);
+  const [columns, setColumns] = React.useState([
+    {
+      title: 'Role',
+      dataIndex: 'name',
+      key: 'name',
+      render: text => {
+        return <a>{text}</a>;
+      }
+    },
+    {
+      title: 'Employee or Affliate',
+      dataIndex: 'roleType',
+      key: 'roleType',
+      render: (text, record) => {
+        return (
+          <Select
+            showSearch
+            style={{ width: 200 }}
+            placeholder='Select a person'
+            optionFilterProp='children'
+            value={text}
+            onChange={e => onChangeType(e, record)}
+          >
+            <Select.Option value='Employee'>Employee</Select.Option>
+            <Select.Option value='Affliate'>Affliate</Select.Option>
+          </Select>
+        );
+      }
+    },
+    {
+      title: 'Define Role',
+      key: 'role',
+      dataIndex: 'role',
+      render: (text, record) => {
+        return <Input onChange={e => onChangeRole(e, record)} value={text} />;
+      }
+    },
+    {
+      title: 'operation',
+      dataIndex: 'operation',
+      render: (text, record) =>
+        data.length >= 1 ? (
+          <Popconfirm
+            title='Sure to delete?'
+            onConfirm={() => handleDeleteRow(record.key)}
+          >
+            <a>Delete</a>
+          </Popconfirm>
+        ) : null
+    }
+  ]);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -94,57 +145,6 @@ const Roles = props => {
     setData(tempData);
   };
 
-  const columns = [
-    {
-      title: 'Role',
-      dataIndex: 'name',
-      key: 'name',
-      render: text => {
-        return <a>{text}</a>;
-      }
-    },
-    {
-      title: 'Employee or Affliate',
-      dataIndex: 'roleType',
-      key: 'roleType',
-      render: (text, record) => {
-        return (
-          <Select
-            showSearch
-            style={{ width: 200 }}
-            placeholder='Select a person'
-            optionFilterProp='children'
-            value={text}
-            onChange={e => onChangeType(e, record)}
-          >
-            <Select.Option value='Employee'>Employee</Select.Option>
-            <Select.Option value='Affliate'>Affliate</Select.Option>
-          </Select>
-        );
-      }
-    },
-    {
-      title: 'Define Role',
-      key: 'role',
-      dataIndex: 'role',
-      render: (text, record) => {
-        return <Input onChange={e => onChangeRole(e, record)} value={text} />;
-      }
-    },
-    {
-      title: 'operation',
-      dataIndex: 'operation',
-      render: (text, record) =>
-        data.length >= 1 ? (
-          <Popconfirm
-            title='Sure to delete?'
-            onConfirm={() => handleDeleteRow(record.key)}
-          >
-            <a>Delete</a>
-          </Popconfirm>
-        ) : null
-    }
-  ];
   return (
     <>
       <div style={{ textAlign: 'left' }}>

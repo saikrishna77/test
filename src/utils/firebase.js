@@ -1,6 +1,7 @@
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 import 'firebase/auth';
-import 'firebase/database';
+import 'firebase/firestore';
+import 'firebase/storage';
 
 const config = {
   apiKey: 'AIzaSyAhm0ISOdVs6ubw9Z2lLnTCaE3L4RgpJq0',
@@ -13,9 +14,15 @@ const config = {
   measurementId: 'G-K5MFPQ72L2'
 };
 
-export default !firebase.apps.length
-  ? firebase.initializeApp(config)
-  : firebase.app();
+const exportSetting = () => {
+  if (!firebase.apps.length) {
+    return firebase.initializeApp(config);
+  } else {
+    return firebase.app();
+  }
+};
+
+export default exportSetting();
 
 // class Firebase {
 //   constructor() {
