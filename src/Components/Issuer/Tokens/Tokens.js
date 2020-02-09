@@ -117,6 +117,7 @@ const Tokens = props => {
                     data[i].basicDetails.symbol +
                     '&edit=true'
                 );
+                window.location.reload();
               }}
             >
               Configure

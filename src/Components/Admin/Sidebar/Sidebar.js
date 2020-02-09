@@ -6,11 +6,23 @@ const { SubMenu } = Menu;
 const { Text } = Typography;
 
 const { Header, Sider } = Layout;
+
 const AdminSideBar = props => {
+  const [defaultMenu, setDefaultMenu] = React.useState();
+
+  React.useEffect(() => {
+    if (window.location.pathname === '/admin/issuerSuperAdmins') {
+      setDefaultMenu(['1']);
+    } else if (window.location.pathname === '/admin/registrationRequests') {
+      setDefaultMenu(['2']);
+    }
+  }, []);
+
   const logout = () => {
     firebase.auth().signOut();
     props.history.push('/login');
   };
+
   return (
     <Layout>
       <Header
@@ -68,11 +80,15 @@ const AdminSideBar = props => {
           }}
           theme='dark'
           mode='inline'
-          defaultSelectedKeys={['2']}
+          selectedKeys={defaultMenu}
+          // defaultSelectedKeys={defaultMenu}
         >
           <Menu.Item
             key='1'
-            onClick={() => props.history.push('/admin/issuerSuperAdmins')}
+            onClick={() => {
+              setDefaultMenu(['1']);
+              props.history.push('/admin/issuerSuperAdmins');
+            }}
           >
             <Icon type='user' />
             <span className='profile'>Issuer Super Admins</span>
@@ -88,14 +104,17 @@ const AdminSideBar = props => {
           >
             <Menu.Item
               key='2'
-              onClick={() => props.history.push('/admin/registrationRequests')}
+              onClick={() => {
+                setDefaultMenu(['2']);
+                props.history.push('/admin/registrationRequests');
+              }}
             >
               Registration Requests
             </Menu.Item>
             <Menu.Item key='3'>Verification Requests</Menu.Item>
           </SubMenu>
           <Menu.Item
-            key='3'
+            key='4'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}
           >

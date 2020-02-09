@@ -7,6 +7,16 @@ const { Text } = Typography;
 const { Header, Sider } = Layout;
 
 const UserSideBar = props => {
+  const [defaultMenu, setDefaultMenu] = React.useState();
+
+  React.useEffect(() => {
+    if (window.location.pathname === '/issuer/tokens') {
+      setDefaultMenu(['1']);
+    } else {
+      setDefaultMenu(['2']);
+    }
+  }, []);
+
   const logout = () => {
     firebase.auth().signOut();
     props.history.push('/login');
@@ -65,11 +75,12 @@ const UserSideBar = props => {
           }}
           theme='dark'
           mode='inline'
-          defaultSelectedKeys={['1']}
+          selectedKeys={defaultMenu}
         >
           <Menu.Item
             key='1'
             onClick={() => {
+              setDefaultMenu(['1']);
               props.history.push('/issuer/tokens');
             }}
           >
@@ -79,6 +90,7 @@ const UserSideBar = props => {
           <Menu.Item
             key='2'
             onClick={() => {
+              setDefaultMenu(['2']);
               props.history.push('/issuer/tokenCreation/reserve');
             }}
           >

@@ -37,7 +37,7 @@ const NormalLoginForm = props => {
                   props.history.push('/issuer/tokens');
                 }
               } else {
-                props.history.push('/admin/registrationRequests');
+                props.history.push('/admin/issuerSuperAdmins');
               }
               console.log('Document data:', doc.data());
             }

@@ -15,6 +15,7 @@ const AllRequests = props => {
         const tokenRef = db.collection('users');
         tokenRef
           .where('flag', '==', true)
+          .where('role', '==', 'issuer')
           .get()
           .then(snapshot => {
             if (snapshot.empty) {

@@ -18,6 +18,7 @@ const PendingRequests = props => {
         tokenRef
           .where('flag', '==', true)
           .where('status.adminApproved', '==', 'pending')
+          .where('role','==','issuer')
           .get()
           .then(snapshot => {
             if (snapshot.empty) {

@@ -1,28 +1,62 @@
 import React from 'react';
 import { Table, Card } from 'antd';
 import { withRouter } from 'react-router-dom';
+import firebase from '../../../utils/firebase';
 
-const IssuerSuperAdmins = () => {
-  const dataSource = [
-    {
-      key: '1',
-      firstName: 'sree',
-      lastName: 'teja',
-      company: 'CCAP',
-      email: 'sreet@ccap.com',
-      phone: '9040040400',
-      createdOn: '10/08/2020'
-    },
-    {
-      key: '2',
-      firstName: 'muth',
-      lastName: 'yala',
-      company: 'ello',
-      email: 's@n.com',
-      phone: '829932',
-      createdOn: '10/02/1923'
-    }
-  ];
+const IssuerSuperAdmins = props => {
+  const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const fetchData = () => {
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (user) {
+        const db = firebase.firestore();
+        const tokenRef = db.collection('users');
+        tokenRef
+          .where('flag', '==', true)
+          .where('role', '==', 'admin')
+          .get()
+          .then(snapshot => {
+            if (snapshot.empty) {
+              setLoading(false);
+              console.log('No matching documents.');
+              return;
+            }
+            let tempData = [];
+            let i = 0;
+            snapshot.forEach(doc => {
+              i++;
+              tempData.push({
+                firstName: doc.data().firstName,
+                lastName: doc.data().lastName,
+                email: doc.data().email,
+                company: doc.data().company,
+                phone: doc.data().phone,
+                tentativeDate: doc.data().tentativeDate,
+                createdOn: new Date(
+                  doc.data().userRegisterTimeStamp
+                ).toLocaleString(),
+                key: i
+              });
+            });
+            setData(tempData);
+            setLoading(false);
+          })
+          .catch(err => {
+            setLoading(false);
+            console.log('Error getting documents', err);
+          });
+      } else {
+        props.history.push('/login');
+      }
+    });
+  };
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const columns = [
     { title: '#', dataIndex: 'key', key: 'key' },
@@ -71,9 +105,10 @@ const IssuerSuperAdmins = () => {
         List Of All Issuer Super Admins
       </div>
       <Table
-        dataSource={dataSource}
+        dataSource={data}
         pagination={false}
         columns={columns}
+        loading={loading}
       ></Table>
     </Card>
   );

@@ -5,11 +5,14 @@ import firebase from '../../../../utils/firebase';
 
 const Roles = props => {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
   React.useEffect(() => {
     const search = props.location.search;
     const params = new URLSearchParams(search);
     const symbol = params.get('symbol');
     if (params.get('edit')) {
+      setLoading(true);
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')
         .doc(symbol + '-' + localStorage.getItem('uid'))
@@ -17,6 +20,7 @@ const Roles = props => {
         .then(snapshot => {
           console.log(snapshot.data());
           setData(snapshot.data().roles);
+          setLoading(false);
         });
     } else {
       setData([
@@ -154,6 +158,7 @@ const Roles = props => {
         dataSource={data}
         style={{ marginTop: '2%' }}
         pagination={false}
+        loading={loading}
       />
       <div style={{ textAlign: 'right' }}>
         <Button

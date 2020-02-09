@@ -34,7 +34,7 @@ function App(props) {
                   props.history.push('/issuer/tokens');
                 }
               } else if (doc.data().role === 'admin') {
-                props.history.push('/admin/registrationRequests');
+                props.history.push('/admin/issuerSuperAdmins');
               }
             } else {
               const subRoute = window.location.pathname
