@@ -13,13 +13,13 @@ class RegistrationForm extends React.Component {
   };
 
   handleSubmit = e => {
-    this.setState({ loading: true });
     e.preventDefault();
     const DisplayErrorOkClicked = () => {
       this.setState({ setError: false });
     };
     this.props.form.validateFieldsAndScroll(async (err, values) => {
       if (!err) {
+        this.setState({ loading: true });
         let msg = await MetamaskService();
         if (msg === 'Install metamask') {
           return Modal.error({
@@ -58,6 +58,23 @@ class RegistrationForm extends React.Component {
                     adminApproved: 'pending'
                   }
                 });
+              firebase.auth().onAuthStateChanged(async function(user) {
+                if (user) {
+                  user
+                    .sendEmailVerification()
+                    .then(() => {
+                      message.success(
+                        'Email verification link sent to your email.'
+                      );
+                    })
+                    .catch(e => {
+                      console.log(e);
+                      message.error(
+                        'Email not verified, problem sending email try again later.'
+                      );
+                    });
+                }
+              });
               this.props.history.push('/pendingRegistrationError');
             })
             .catch(error => {
@@ -247,7 +264,11 @@ class RegistrationForm extends React.Component {
             })(<Input />)}
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
-            <Button type='primary' htmlType='submit'>
+            <Button
+              type='primary'
+              htmlType='submit'
+              loading={this.state.loading}
+            >
               Register
             </Button>
             <br />
