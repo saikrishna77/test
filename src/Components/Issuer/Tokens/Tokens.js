@@ -59,6 +59,8 @@ const Tokens = props => {
           <b>{hours}</b> hours
           <br />
           <b>{minutes}</b> minutes
+          <br />
+          {seconds}
         </div>
       );
     }

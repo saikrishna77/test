@@ -9,6 +9,7 @@ const ReserveToken = props => {
   const [selectedWallet, setSelectedWallet] = React.useState('');
   const [tokenReserved, setTokenReserved] = React.useState(false);
   const [ethereum, setEthereum] = React.useState(window['ethereum']);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (typeof window['ethereum'] === 'undefined') {
@@ -28,6 +29,7 @@ const ReserveToken = props => {
   }, [ethereum]);
 
   const submit = async symbol => {
+    setLoading(true);
     const db = firebase.firestore();
     let resp = await db
       .collection('reservedTokenSymbols')
@@ -47,6 +49,7 @@ const ReserveToken = props => {
             ethereumAddress: selectedWallet
           }
         });
+      setLoading(false);
       props.history.push('/issuer/tokenCreation/roles?symbol=' + symbol);
     } else {
       Modal.error({
@@ -54,7 +57,9 @@ const ReserveToken = props => {
         content:
           'The Token Symbol has been registered, you can try different token symbol'
       });
+      setLoading(false);
     }
+    setLoading(false);
     // setTokenReserved(!tokenReserved);
   };
 
@@ -68,7 +73,11 @@ const ReserveToken = props => {
   return (
     <div style={{ marginTop: '7%' }}>
       {!tokenReserved ? (
-        <Reserve selectedWallet={selectedWallet} submit={submit} />
+        <Reserve
+          selectedWallet={selectedWallet}
+          submit={submit}
+          loading={loading}
+        />
       ) : null}
       {tokenReserved ? <Reserved selectedWallet={selectedWallet} /> : null}
       {/* <Button onClick={changeState}>ChangeState</Button> */}

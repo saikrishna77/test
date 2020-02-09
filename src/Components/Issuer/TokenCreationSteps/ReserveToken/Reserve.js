@@ -31,6 +31,7 @@ const Reserve = props => {
           style={{ marginTop: '3%' }}
           onClick={() => props.submit(symbol)}
           disabled={!props.selectedWallet}
+          loading={props.loading}
         >
           Reserve Token Symbol
         </Button>
