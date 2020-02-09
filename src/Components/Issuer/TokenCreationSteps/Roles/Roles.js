@@ -19,7 +19,7 @@ const Roles = props => {
         .get()
         .then(snapshot => {
           console.log(snapshot.data());
-          setData(snapshot.data().roles);
+          if (snapshot.data().roles) setData(snapshot.data().roles);
           setLoading(false);
         });
     } else {
