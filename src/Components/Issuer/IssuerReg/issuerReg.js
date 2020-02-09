@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
-
+import mailer from './mailer'
 import {
-  Upload,
+  notification,
   Icon,
   Form,
   Input,
@@ -14,25 +14,31 @@ import {
   Typography,
   DatePicker,
   Radio,
-  Modal,
-  InputNumber
+  Modal
 } from 'antd';
-import axios from 'axios';
+// import axios from 'axios';
 const storage = firebase.storage();
 const { Option } = Select;
 const { Text } = Typography;
 const { TextArea } = Input;
 
 const Registration = props => {
+  const [errFlag, setErrFlag] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState(false);
   const [infoFlag, setInfoFlag] = useState(true);
   const [infoFlag2, setInfoFlag2] = useState(true);
   const [infoFlag3, setInfoFlag3] = useState(true);
   const [createFlag, setCreateFlag] = useState(false);
   const [zipFlag, setZipFlag] = useState(false);
-  // const nodemailer = require('nodemailer');
 
   let [regulationFlag, setregulationFlag] = useState(false);
-
+  const openNotificationWithIcon = (type, message, description) => {
+    notification[type]({
+      message,
+      description
+    });
+  };
   //images
   const [company_reg_uploads, setcomapnay_reg_uploads] = useState('');
   const [tax_reg_uploads, settax_reg_uploads] = useState('');
@@ -75,40 +81,40 @@ const Registration = props => {
 
     setvisible(false);
   };
-  // Uncomment when merged
-  // useEffect(() => {
-  //   firebase.auth().onAuthStateChanged(async function(user) {
-  //     if (user) {
-  //       if (user.emailVerified) {
-  //         const db = firebase.firestore();
-  //         const doc = await db
-  //           .collection('users')
-  //           .doc(user.uid)
-  //           .get();
-  //         if (!doc.exists) {
-  //           console.log('No such document!');
-  //         } else {
-  //           console.log(window.location.pathname);
-  //           if (window.location.pathname === '/') {
-  //             // if (doc.data().role === 'issuer') {
-  //             if (false) {
-  //               props.history.push('/issuer/tokens');
-  //             } else {
-  //               props.history.push('/admin/issuerSuperAdmins');
-  //             }
-  //           } else {
-  //             props.history.push(
-  //               window.location.pathname + props.location.search
-  //             );
-  //           }
-  //           console.log('Document data:', doc.data());
-  //         }
-  //       }
-  //     } else {
-  //       props.history.push('/login');
-  //     }
-  //   });
-  // }, []);
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (user) {
+        if (user.emailVerified) {
+          const db = firebase.firestore();
+          const doc = await db
+            .collection('users')
+            .doc(user.uid)
+            .get();
+          if (!doc.exists) {
+            console.log('No such document!');
+          } else {
+            console.log(window.location.pathname);
+            if (window.location.pathname === '/') {
+              // if (doc.data().role === 'issuer') {
+              if (false) {
+                props.history.push('/issuer/tokens');
+              } else {
+                props.history.push('/admin/issuerSuperAdmins');
+              }
+            } else {
+              props.history.push(
+                window.location.pathname + props.location.search
+              );
+            }
+            console.log('Document data:', doc.data());
+          }
+        }
+      } else {
+        props.history.push('/login');
+      }
+    });
+  }, []);
 
   const onChangeHandler = (e, name) => {
     if (name === 'ComapanyName') {
@@ -136,17 +142,16 @@ const Registration = props => {
         setCreateFlag(false);
       }
       console.log(e.target.value);
-      //
     } else if (name === 'country') {
       setCountry(e);
     } else if (name === 'state') {
       setStates(e);
-      //
     } else if (name === 'zipCode') {
       let value = e.target.value;
       console.log(e.target.value);
-      if (value > 9999 && value < 9999999) {
+      if (value > 9999 && value < 999999) {
         setZipFlag(true);
+        setErrFlag(true);
       } else {
         setZipFlag(false);
       }
@@ -171,84 +176,78 @@ const Registration = props => {
     }
   };
 
-  // async function mailer() {
-  //   let transporter = nodemailer.createTransport({
-  //     host: 'smtp.ethereal.email',
-  //     port: 587,
-  //     secure: false,
-  //     auth: {
-  //       user: 'KrishnaS@CryptoAssetRating.com',
-  //       pass: 'CCAPisgr8'
-  //     }
-  //   });
-
-  //   let info = await transporter.sendMail({
-  //     from: 'KrishnaS@CryptoAssetRating.com',
-  //     to: 'samalakrishna7@gmail.com',
-  //     subject: 'Issuer Registration Reminder',
-  //     text: 'saikrishna has requested for details',
-  //     html: '<b>Issuer Reminder</b>'
-  //   });
-
-  //   console.log('Message sent: %s', info.messageId);
-
-  //   console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-  // }
+  
   const save_boardData = async () => {
-    console.log(
-      company_reg_uploads,
-      tax_reg_uploads,
-      sec_filing_doc,
-      board_res_uploads
-    );
-    const form = new FormData();
-    form.set('companyName', ComapanyName);
-    form.set('country', country);
-    form.set('state', state);
-    form.set('zipCode', zipCode);
-    form.set('taxID', taxID);
-    form.set('company_reg_uploads', company_reg_uploads);
-    await fileUpload(company_reg_uploads);
-    form.set('tax_reg_uploads', tax_reg_uploads);
-    await fileUpload(tax_reg_uploads);
-    form.set('radio', radio);
-    if (radio === 'upload') {
-      form.set('board_res_uploads', board_res_uploads);
-      await fileUpload(board_res_uploads);
-    } else {
-      form.set('text_area', text_area);
-      form.set('text_board', text_board);
+    try {
+      setLoading(true);
+      console.log(company_reg_uploads, tax_reg_uploads, board_res_uploads);
+      if (
+        company_reg_uploads === '' ||
+        tax_reg_uploads === '' ||
+        board_res_uploads === '' ||
+        errFlag === 'true' ||
+        radio === '' ||
+        Regulation === '' ||
+        state === '' ||
+        country === '' ||
+        date === '' ||
+        taxID === '' ||
+        issuer_radio === ''
+      ) {
+        console.log('nope');
+        setErrMsg(
+          'Please make sure you enter all * marked Details & all requested images'
+        );
+      } else {
+        setErrMsg('');
+        const form = {
+          companyName: ComapanyName,
+          country: country,
+          state: state,
+          zipCode: zipCode,
+          taxID: taxID,
+          radio: radio,
+          ComapanyIssue: ComapanyIssue,
+          Regulation: Regulation,
+          issuer_radio: issuer_radio
+        };
+        await fileUpload(tax_reg_uploads, form.companyName);
+        await fileUpload(company_reg_uploads, form.companyName);
+        await fileUpload(board_res_uploads, form.companyName);
+        if (radio === 'upload') {
+          await fileUpload(sec_filing_doc, form.companyName);
+        } else {
+          form.text_area = text_area;
+          form.text_board = text_board;
+        }
+        const db = firebase.firestore();
+        console.log(form);
+        const ref = db.collection('issuer_register').doc();
+        let res = await ref.set({ issuer_data: form });
+        console.log(res);
+        mailer();
+        openNotificationWithIcon(
+          'success',
+          'data has been  saved',
+          `data has been  saved`
+        );
+        setLoading(false);
+      }
+    } catch (e) {
+      console.log(e);
+      openNotificationWithIcon(
+        'error',
+        'data has been not been saved',
+        `data has been not been saved`
+      );
     }
-    form.set('ComapanyIssue', ComapanyIssue);
-    form.set('Regulation', Regulation);
-    form.set('issuer_radio', issuer_radio);
-    form.set('sec_filing_doc', sec_filing_doc);
-    await fileUpload(sec_filing_doc);
-
-    firebase.analytics();
-    const db = firebase.firestore();
-    const ref = db.collection('issuer_register').doc();
-    let res = await ref.set(form);
-    console.log(res);
-    // await mailer();
   };
 
-  const fileUpload = fileName => {
-    const uploadTask = storage
-      .ref(`/issuer_registration_images/${fileName.name}`)
+  const fileUpload = async (fileName, name) => {
+    const uploadTask = await storage
+      .ref(`/issuer_registration_images/${name}/${fileName.name}`)
       .put(fileName);
-    uploadTask.on(
-      'state_changed',
-      snapShot => {
-        console.log(snapShot);
-      },
-      err => {
-        console.log(err);
-      },
-      url => {
-        console.log(url);
-      }
-    );
+    console.log(uploadTask);
   };
 
   return (
@@ -258,7 +257,8 @@ const Registration = props => {
           color: '#186AB4',
           fontSize: '40px',
           padding: '2%',
-          width: '80vw'
+          width: '80vw',
+          marginLeft: '5%'
         }}
       >
         <Text>Issuer Registration</Text>
@@ -398,7 +398,7 @@ const Registration = props => {
                   type='file'
                   id='tax-reg-doc'
                   onChange={e => {
-                    onChangeHandler(e, 'tax-reg-uploads');
+                    onChangeHandler(e, 'tax_reg_uploads');
                   }}
                 />
               </Form.Item>
@@ -601,9 +601,15 @@ const Registration = props => {
       </div>
       <br></br>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {<Text style={{ color: 'red' }}>{errMsg}</Text>}
+        <br></br>
         <Button type='danger'>Cancel</Button>
         <div>
-          <Button type='primary' onClick={e => showModal(e)}>
+          <Button
+            style={{ marginLeft: '10px' }}
+            type='primary'
+            onClick={e => showModal(e)}
+          >
             Preview
           </Button>
           <Modal
@@ -659,6 +665,7 @@ const Registration = props => {
         </div>
 
         <Button
+          loading={loading}
           style={{ marginLeft: '10px' }}
           type='primary'
           onClick={e => {
