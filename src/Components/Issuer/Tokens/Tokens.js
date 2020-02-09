@@ -2,6 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
 import { Card, Row, Col, Button, Empty, Spin } from 'antd';
+import Countdown from 'react-countdown';
 
 const Tokens = props => {
   const [data, setData] = React.useState([]);
@@ -22,7 +23,10 @@ const Tokens = props => {
             }
             let tempData = [];
             snapshot.forEach(doc => {
-              tempData.push({ ...doc.data(), id: doc.id });
+              tempData.push({
+                ...doc.data(),
+                id: doc.id
+              });
               console.log(doc.id, '=>', doc.data());
             });
             setData(tempData);
@@ -35,7 +39,31 @@ const Tokens = props => {
         props.history.push('/login');
       }
     });
-  }, []);
+  }, [props.history]);
+
+  //countdown reders start
+  const CountdownCompleted = () => (
+    <div style={{ fontSize: '20px', color: '#db5e56' }}>Your Token Expired</div>
+  );
+
+  const renderer = ({ days, hours, minutes, seconds, completed }) => {
+    if (completed) {
+      return <CountdownCompleted />;
+    } else {
+      // Render a countdown
+      return (
+        // <div style={{fontSize: '40px'}}>{hours}</div>
+        <div style={{ color: '#db5e56', fontSize: '20px' }}>
+          <b>{days}</b> days
+          <br />
+          <b>{hours}</b> hours
+          <br />
+          <b>{minutes}</b> minutes
+        </div>
+      );
+    }
+  };
+  //countdown renders stop
 
   const RenderCards = () => {
     const cardsArr = [];
@@ -70,8 +98,18 @@ const Tokens = props => {
                 data[i].basicDetails.symbolCreationTime
               ).toLocaleDateString()}{' '}
             </p>
+            <div>
+              Your token expires in
+              <Countdown
+                date={data[i].basicDetails.symbolCreationTime + 1.296e9}
+                renderer={renderer}
+              ></Countdown>
+            </div>
             <Button
               type='primary'
+              disabled={
+                Date.now() > data[i].basicDetails.symbolCreationTime + 1.296e9
+              }
               onClick={() => {
                 props.history.push(
                   '/issuer/tokenCreation/roles?symbol=' +
