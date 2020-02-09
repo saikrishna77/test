@@ -115,6 +115,12 @@ const AdminSideBar = props => {
           </SubMenu>
           <Menu.Item
             key='4'
+            onClick={() => {
+              props.history.push('/issuer/issuerReg');
+            }}
+          ></Menu.Item>
+          <Menu.Item
+            key='5'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}
           >

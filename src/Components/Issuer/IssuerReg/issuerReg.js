@@ -195,6 +195,7 @@ const Registration = props => {
         issuer_radio === ''
       ) {
         console.log('nope');
+        setLoading(false);
         setErrMsg(
           'Please make sure you enter all * marked Details & all requested images'
         );
@@ -600,9 +601,8 @@ const Registration = props => {
         </Form>
       </div>
       <br></br>
+      {<><Text style={{ color: 'red' }}>{errMsg}</Text><br></br></>}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {<Text style={{ color: 'red' }}>{errMsg}</Text>}
-        <br></br>
         <Button type='danger'>Cancel</Button>
         <div>
           <Button

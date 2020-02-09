@@ -99,6 +99,16 @@ const UserSideBar = props => {
           </Menu.Item>
           <Menu.Item
             key='3'
+            onClick={() => {
+              setDefaultMenu(['3']);
+              props.history.push('/issuer/issuerReg');
+            }}
+          >
+            <Icon type='user' />
+            <span className='nav-text'>Issuer Registration</span>
+          </Menu.Item>
+          <Menu.Item
+            key='3'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}
           >
