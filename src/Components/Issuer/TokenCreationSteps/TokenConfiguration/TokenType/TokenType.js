@@ -36,6 +36,7 @@ class TokenType extends React.Component {
     const symbol = params.get('symbol');
     this.setState({ symbol: symbol });
     if (params.get('edit')) {
+      firebase.analytics();
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')
         .doc(symbol + '-' + localStorage.getItem('uid'))
@@ -80,6 +81,7 @@ class TokenType extends React.Component {
           const search = this.props.location.search; // could be '?foo=bar'
           const params = new URLSearchParams(search);
           const symbol = params.get('symbol'); // bar
+          firebase.analytics();
           const db = firebase.firestore();
           await db
             .collection('reservedTokenSymbols')

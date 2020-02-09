@@ -18,6 +18,7 @@ function App(props) {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
         if (user.emailVerified) {
+          firebase.analytics()
           const db = firebase.firestore();
           const doc = await db
             .collection('users')

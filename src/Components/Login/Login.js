@@ -13,6 +13,7 @@ const NormalLoginForm = props => {
         try {
           values.username = values.username.trim();
           setLoading(true);
+          firebase.analytics();
           let res = await firebase
             .auth()
             .signInWithEmailAndPassword(values.username, values.password);

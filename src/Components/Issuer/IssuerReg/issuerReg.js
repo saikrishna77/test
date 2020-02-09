@@ -225,6 +225,7 @@ const Registration = props => {
     form.set('sec_filing_doc', sec_filing_doc);
     await fileUpload(sec_filing_doc);
 
+    firebase.analytics();
     const db = firebase.firestore();
     const ref = db.collection('issuer_register').doc();
     let res = await ref.set(form);

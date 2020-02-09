@@ -64,6 +64,7 @@ const Roles = props => {
     const symbol = params.get('symbol');
     if (params.get('edit')) {
       setLoading(true);
+      firebase.analytics();
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')
         .doc(symbol + '-' + localStorage.getItem('uid'))
@@ -102,6 +103,7 @@ const Roles = props => {
     const params = new URLSearchParams(search);
     const symbol = params.get('symbol');
     console.log(symbol);
+    firebase.analytics();
     const db = firebase.firestore();
     await db
       .collection('reservedTokenSymbols')

@@ -39,6 +39,7 @@ const Vesting = props => {
     const symbol = params.get('symbol');
     if (params.get('edit')) {
       setEditMode(true);
+      firebase.analytics();
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')
         .doc(symbol + '-' + localStorage.getItem('uid'))
@@ -258,6 +259,7 @@ const Vesting = props => {
         const params = new URLSearchParams(search);
         const symbol = params.get('symbol');
         console.log(symbol);
+        firebase.analytics();
         const db = firebase.firestore();
         db.collection('reservedTokenSymbols')
           .doc(symbol + '-' + localStorage.getItem('uid'))
@@ -295,6 +297,7 @@ const Vesting = props => {
         const params = new URLSearchParams(search);
         const symbol = params.get('symbol');
         console.log(symbol);
+        firebase.analytics();
         const db = firebase.firestore();
         if (editMode) {
           db.collection('reservedTokenSymbols')

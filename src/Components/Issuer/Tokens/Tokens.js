@@ -11,6 +11,7 @@ const Tokens = props => {
   React.useEffect(() => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
+        firebase.analytics();
         const db = firebase.firestore();
         const tokenRef = db.collection('reservedTokenSymbols');
         tokenRef

@@ -10,6 +10,7 @@ const IssuerSuperAdmins = props => {
   const fetchData = () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
+        firebase.analytics();
         const db = firebase.firestore();
         const tokenRef = db.collection('users');
         tokenRef

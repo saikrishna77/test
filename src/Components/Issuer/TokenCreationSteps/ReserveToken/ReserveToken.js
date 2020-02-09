@@ -30,6 +30,7 @@ const ReserveToken = props => {
 
   const submit = async symbol => {
     setLoading(true);
+    firebase.analytics();
     const db = firebase.firestore();
     let resp = await db
       .collection('reservedTokenSymbols')

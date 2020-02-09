@@ -29,6 +29,7 @@ class RegistrationForm extends React.Component {
             }
           });
         } else {
+          firebase.analytics();
           firebase
             .auth()
             .createUserWithEmailAndPassword(values.email, values.password)

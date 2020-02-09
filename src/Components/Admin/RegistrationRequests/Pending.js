@@ -13,12 +13,13 @@ const PendingRequests = props => {
   const fetchData = () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
+        firebase.analytics();
         const db = firebase.firestore();
         const tokenRef = db.collection('users');
         tokenRef
           .where('flag', '==', true)
           .where('status.adminApproved', '==', 'pending')
-          .where('role','==','issuer')
+          .where('role', '==', 'issuer')
           .get()
           .then(snapshot => {
             if (snapshot.empty) {
@@ -74,6 +75,7 @@ const PendingRequests = props => {
 
   const accept = record => {
     setLoading(true);
+    firebase.analytics();
     const db = firebase.firestore();
     const ref = db.collection('users').doc(record.id);
     ref.update({ 'status.adminApproved': 'approved' });
@@ -83,6 +85,7 @@ const PendingRequests = props => {
 
   const reject = record => {
     setLoading(true);
+    firebase.analytics();
     const db = firebase.firestore();
     const ref = db.collection('users').doc(record.id);
     // ref.update({ 'status.adminApproved': 'rejected' });
