@@ -7,10 +7,12 @@ import firebase from '../../utils/firebase';
 class RegistrationForm extends React.Component {
   state = {
     confirmDirty: false,
-    autoCompleteResult: []
+    autoCompleteResult: [],
+    loading: false
   };
 
   handleSubmit = e => {
+    this.setState({ loading: true });
     e.preventDefault();
     const DisplayErrorOkClicked = () => {
       this.setState({ setError: false });
@@ -63,6 +65,7 @@ class RegistrationForm extends React.Component {
         console.log('Received values of form: ', values);
       }
     });
+    this.setState({ loading: false });
   };
 
   handleConfirmBlur = e => {

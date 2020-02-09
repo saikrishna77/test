@@ -27,7 +27,6 @@ const Tokens = props => {
                 ...doc.data(),
                 id: doc.id
               });
-              console.log(doc.id, '=>', doc.data());
             });
             setData(tempData);
             setLoading(false);
@@ -72,7 +71,7 @@ const Tokens = props => {
     for (let i = 0; i < data.length; i++) {
       let temp;
       temp = (
-        <Col span={8} key='i'>
+        <Col span={8} key={i}>
           <Card
             title={data[i].basicDetails.symbol}
             style={{

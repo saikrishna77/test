@@ -73,7 +73,7 @@ function App(props) {
         props.history.push('/login');
       }
     });
-  }, []);
+  }, [props.history, props.location.search]);
   const RegisterFormComp = () => {
     return (
       <div>
