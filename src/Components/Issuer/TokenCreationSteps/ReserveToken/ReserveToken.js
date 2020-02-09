@@ -7,8 +7,8 @@ import firebase from '../../../../utils/firebase';
 
 const ReserveToken = props => {
   const [selectedWallet, setSelectedWallet] = React.useState('');
-  const [tokenReserved, setTokenReserved] = React.useState(false);
-  const [ethereum, setEthereum] = React.useState(window['ethereum']);
+  const [tokenReserved, ] = React.useState(false);
+  const [ethereum, ] = React.useState(window['ethereum']);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {

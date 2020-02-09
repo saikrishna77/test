@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { Form, Input, Button, Card, Modal } from 'antd';
+import { Form, Input, Button, Card, Modal, message } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { MetamaskService } from '../../utils/metamask';
 import firebase from '../../utils/firebase';
@@ -60,6 +61,9 @@ class RegistrationForm extends React.Component {
               this.props.history.push('/pendingRegistrationError');
             })
             .catch(error => {
+              if (error.code === 'auth/email-already-in-use') {
+                message.error('email already registered with us.');
+              }
               console.log(error);
             });
         }

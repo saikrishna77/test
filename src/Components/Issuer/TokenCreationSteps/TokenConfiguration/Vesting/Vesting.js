@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import {
   Input,
@@ -12,8 +13,6 @@ import {
   Alert,
   Popconfirm
 } from 'antd';
-import axios from 'axios';
-import api_url from '../../../../../api_url';
 import firebase from '../../../../../utils/firebase';
 import { withRouter } from 'react-router-dom';
 
@@ -74,15 +73,13 @@ const Vesting = props => {
         nameFlag = true;
       }
     }
+    console.log(vestingName);
+    console.log(new RegExp('^[~*/[]]*$').test(vestingName));
     if (data.length <= 0) {
       setErrMsg(`NO data to save bro`);
       setSetError(true);
     } else if (lockFlag) {
       setErrMsg(`check the lock period for all entries.`);
-      setSetError(true);
-    } else if (!new RegExp('^[^~*/[]]*$').test(vestingName)) {
-      //'~', '*', '/', '[', or ']'
-      setErrMsg(`vesting name Shound not contain ~ * / [ or ]`);
       setSetError(true);
     } else if (nameFlag) {
       setErrMsg(`Dont use the same vesting name twice bro!`);
@@ -101,6 +98,16 @@ const Vesting = props => {
       setSetError(true);
     } else if (vestingName && vestingName.toString().length < 1) {
       setErrMsg('Give the vesting a name, dugh!');
+      setSetError(true);
+    } else if (
+      vestingName.includes('~') ||
+      vestingName.includes('*') ||
+      vestingName.includes('/') ||
+      vestingName.includes('[') ||
+      vestingName.includes(']')
+    ) {
+      //'~', '*', '/', '[', or ']'
+      setErrMsg(`vesting name Shound not contain ~ * / [ or ]`);
       setSetError(true);
     } else if (!vestingMonths) {
       setErrMsg(`Don't your vesting have a duration, dugh!`);
@@ -187,7 +194,6 @@ const Vesting = props => {
 
   const editVestingNameChange = e => {
     console.log(e);
-    console.log(editData['first']);
     setData(editData[e].data);
     setVestingMonths(editData[e].totalVestingMonths);
     setVestingName(editData[e].vestingName);
@@ -574,7 +580,7 @@ const Vesting = props => {
           <Button type='primary' onClick={onSubmit} loading={loading}>
             Save the Vesting Schedule
           </Button>
-          {scheduleNames.length > 0 ? (
+          {scheduleNames.length > 0 || editMode ? (
             <Button
               type='primary'
               onClick={handleNextPhase}

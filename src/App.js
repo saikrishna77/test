@@ -75,7 +75,8 @@ function App(props) {
         props.history.push('/login');
       }
     });
-  }, [props.history, props.location.search]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const RegisterFormComp = () => {
     return (
       <div>
