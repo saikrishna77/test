@@ -12,13 +12,14 @@ import Tokens from './Components/Issuer/Tokens/Tokens';
 import firebase from './utils/firebase';
 import ErrorPage from './Components/Issuer/ErrorPage/ErrorPage';
 import IssuerReg from './Components/Issuer/IssuerReg/issuerReg';
+import ComplianceForm from './Components/Compliance/ComplianceForm';
 
 function App(props) {
   React.useEffect(() => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
         if (user.emailVerified) {
-          firebase.analytics()
+          firebase.analytics();
           const db = firebase.firestore();
           const doc = await db
             .collection('users')
@@ -75,7 +76,7 @@ function App(props) {
         props.history.push('/login');
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const RegisterFormComp = () => {
     return (
@@ -147,6 +148,17 @@ function App(props) {
               <IssuerSideBar />
               <div style={{ marginTop: '6%', marginLeft: '10%' }}>
                 <IssuerReg />
+              </div>
+            </>
+          )}
+        ></Route>
+        <Route
+          path='/issuer/Compliance'
+          render={props => (
+            <>
+              <IssuerSideBar />
+              <div style={{ marginTop: '6%',marginLeft:'10%' }}>
+                <ComplianceForm />
               </div>
             </>
           )}

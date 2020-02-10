@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
-import mailer from './mailer'
+import mailer from './mailer';
 import {
   notification,
   Icon,
@@ -30,8 +30,9 @@ const Registration = props => {
   const [infoFlag2, setInfoFlag2] = useState(true);
   const [infoFlag3, setInfoFlag3] = useState(true);
   const [createFlag, setCreateFlag] = useState(false);
+  const [boardFlag, setBoardFlag] = useState(false);
   const [zipFlag, setZipFlag] = useState(false);
-
+  const [saved,setSaved] = useState(false);
   let [regulationFlag, setregulationFlag] = useState(false);
   const openNotificationWithIcon = (type, message, description) => {
     notification[type]({
@@ -44,9 +45,7 @@ const Registration = props => {
   const [tax_reg_uploads, settax_reg_uploads] = useState('');
   const [board_res_uploads, setboard_res_uploads] = useState('');
   const [sec_filing_doc, setsec_filing_doc] = useState('');
-
   //
-
   //inputs
   const [ComapanyName, setComapanyName] = useState('');
   const [zipCode, setzipCode] = useState();
@@ -58,9 +57,7 @@ const Registration = props => {
   const [ComapanyIssue, setComapanyIssue] = useState('');
   const [Regulation, setRegulation] = useState();
   const [issuer_radio, setissuer_radio] = useState();
-
   //
-
   //selects
   const [country, setCountry] = useState('');
   const [state, setStates] = useState('');
@@ -176,7 +173,6 @@ const Registration = props => {
     }
   };
 
-  
   const save_boardData = async () => {
     try {
       setLoading(true);
@@ -243,6 +239,13 @@ const Registration = props => {
       );
     }
   };
+  const save_mid_boardData = () => {
+    setBoardFlag(true);
+    setTimeout(() => {
+      setSaved(true)
+      setBoardFlag(false);
+    }, 2000);
+  };
 
   const fileUpload = async (fileName, name) => {
     const uploadTask = await storage
@@ -262,7 +265,7 @@ const Registration = props => {
           marginLeft: '5%'
         }}
       >
-        <Text>Issuer Registration</Text>
+        <Text>Basic Issuer Information</Text>
         <br></br>
       </div>{' '}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -386,6 +389,7 @@ const Registration = props => {
                 <br></br>
                 <Input
                   type='file'
+                  accept='image/png'
                   id='company_reg_uploads'
                   onChange={e => {
                     onChangeHandler(e, 'company_reg_uploads');
@@ -397,6 +401,7 @@ const Registration = props => {
                 <br></br>
                 <Input
                   type='file'
+                  accept='image/png'
                   id='tax-reg-doc'
                   onChange={e => {
                     onChangeHandler(e, 'tax_reg_uploads');
@@ -436,11 +441,12 @@ const Registration = props => {
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <Button type='danger'>Cancel</Button>
                       <Button
-                        onClick={e => save_boardData()}
+                        loading={boardFlag}
+                        onClick={e => save_mid_boardData()}
                         style={{ marginLeft: '10px' }}
                         type='primary'
                       >
-                        Save
+                        {boardFlag ? 'Saving' :(saved?'Saved': 'Save')}
                       </Button>
                     </div>
                   </Form.Item>
@@ -451,6 +457,7 @@ const Registration = props => {
                     <Input
                       id='board_res_uploads'
                       type='file'
+                      accept='image/png'
                       onChange={e => {
                         onChangeHandler(e, 'board_res_uploads');
                       }}
@@ -582,6 +589,7 @@ const Registration = props => {
                         </Text>
                         <br></br>
                         <Input
+                          accept='image/png'
                           id='sec_filing_doc'
                           type='file'
                           onChange={e => {
@@ -601,7 +609,12 @@ const Registration = props => {
         </Form>
       </div>
       <br></br>
-      {<><Text style={{ color: 'red' }}>{errMsg}</Text><br></br></>}
+      {
+        <>
+          <Text style={{ color: 'red' }}>{errMsg}</Text>
+          <br></br>
+        </>
+      }
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Button type='danger'>Cancel</Button>
         <div>

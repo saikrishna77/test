@@ -98,7 +98,7 @@ const UserSideBar = props => {
             <span className='nav-text'>Token Creation</span>
           </Menu.Item>
           <Menu.Item
-            key='3'
+            key='4'
             onClick={() => {
               setDefaultMenu(['3']);
               props.history.push('/issuer/issuerReg');
@@ -108,7 +108,17 @@ const UserSideBar = props => {
             <span className='nav-text'>Issuer Registration</span>
           </Menu.Item>
           <Menu.Item
-            key='3'
+            key='5'
+            onClick={() => {
+              setDefaultMenu(['5']);
+              props.history.push('/issuer/Compliance');
+            }}
+          >
+            <Icon type='user' />
+            <span className='nav-text'>Issuer Compliance</span>
+          </Menu.Item>
+          <Menu.Item
+            key='6'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}
           >
