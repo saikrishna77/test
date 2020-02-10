@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { Form, Input, Button, Card, Modal, message } from 'antd';
+import { Form, Input, Button, Card, Modal, message, DatePicker } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { MetamaskService } from '../../utils/metamask';
 import firebase from '../../utils/firebase';
@@ -50,7 +50,7 @@ class RegistrationForm extends React.Component {
                   tokenphase: values.tokenphase,
                   amount: values.amount,
                   underlyingAsset: values.UnderlyingAsset,
-                  tentativeDate: values.tentativeDate,
+                  tentativeDate: values.tentativeDate.format('DD/MM/YYYY'),
                   role: 'issuer',
                   userRegisterTimeStamp: Date.now(),
                   flag: true,
@@ -97,8 +97,15 @@ class RegistrationForm extends React.Component {
 
   compareToFirstPassword = (rule, value, callback) => {
     const { form } = this.props;
+    const strongRegex = new RegExp(
+      '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})'
+    );
     if (value && value !== form.getFieldValue('password')) {
       callback('Two passwords that you enter is inconsistent!');
+    } else if (!strongRegex.test(value)) {
+      callback(
+        'make sure the password contains 1 number, 1 lowercase, 1 uppercase and 1 special character and 8 characters long'
+      );
     } else {
       callback();
     }
@@ -257,11 +264,10 @@ class RegistrationForm extends React.Component {
               rules: [
                 {
                   required: true,
-                  message: 'Please input tentative date!',
-                  whitespace: true
+                  message: 'Please input tentative date!'
                 }
               ]
-            })(<Input />)}
+            })(<DatePicker />)}
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
             <Button
