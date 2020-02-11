@@ -3,6 +3,7 @@ import React from 'react';
 import TokenType from './TokenType/TokenType';
 import { Row, Icon } from 'antd';
 import Vesting from './Vesting/Vesting';
+import Phase from './Phase/Phase';
 
 const TokenConfig = () => {
   const [current, setCurrent] = React.useState('tType');
@@ -59,7 +60,10 @@ const TokenConfig = () => {
           </div>
         </Row>
       ) : current === 'phase' ? (
-        <div>Phase yet to be built</div>
+        <div>
+          <b>Phase</b>
+          <Phase NextTab={handleNextClick} TokenID={firebaseTokenID} />
+        </div>
       ) : current === 'dividend' ? (
         <div>Dividend Yet to be built</div>
       ) : current === 'capTable' ? (

@@ -76,28 +76,28 @@ const Vesting = props => {
     console.log(vestingName);
     console.log(new RegExp('^[~*/[]]*$').test(vestingName));
     if (data.length <= 0) {
-      setErrMsg(`NO data to save bro`);
+      setErrMsg(`NO data to save!`);
       setSetError(true);
     } else if (lockFlag) {
       setErrMsg(`check the lock period for all entries.`);
       setSetError(true);
     } else if (nameFlag) {
-      setErrMsg(`Dont use the same vesting name twice bro!`);
+      setErrMsg(`Dont use the same vesting name twice!`);
       setSetError(true);
     } else if (flag) {
-      setErrMsg(`Theres a zero in the vesting percentage, pooh!`);
+      setErrMsg(`Theres a zero in the vesting percentage!`);
       setSetError(true);
     } else if (displayVesting > 100) {
-      setErrMsg('The total vesting value extended 100%, puh-leeze check nah!');
+      setErrMsg('The total vesting value extended 100%!');
       setSetError(true);
     } else if (displayVesting < 100) {
-      setErrMsg('The toal vesting value is below 100%, puh-leeze check nah!');
+      setErrMsg('The toal vesting value is below 100%!');
       setSetError(true);
     } else if (!vestingName) {
-      setErrMsg('Give the vesting a name, dugh!');
+      setErrMsg('Give the vesting a name!');
       setSetError(true);
     } else if (vestingName && vestingName.toString().length < 1) {
-      setErrMsg('Give the vesting a name, dugh!');
+      setErrMsg('Give the vesting a name!');
       setSetError(true);
     } else if (
       vestingName.includes('~') ||
@@ -110,17 +110,13 @@ const Vesting = props => {
       setErrMsg(`vesting name Shound not contain ~ * / [ or ]`);
       setSetError(true);
     } else if (!vestingMonths) {
-      setErrMsg(`Don't your vesting have a duration, dugh!`);
+      setErrMsg(`vesting duration missing!`);
       setSetError(true);
     } else if (isNaN(displayVesting)) {
-      setErrMsg(
-        `Check all the vesting percentages are entered, puh-leeze check nah!`
-      );
+      setErrMsg(`Check all the vesting percentages are not filled!`);
       setSetError(true);
     } else if (data[data.length - 1].EOD !== vestingMonths) {
-      setErrMsg(
-        'theres something wrong with the total end of vesting month, puh-leeze check nah!'
-      );
+      setErrMsg('theres something wrong with the total end of vesting month!');
       setSetError(true);
     } else {
       setSetNextModal(true);
@@ -155,34 +151,34 @@ const Vesting = props => {
   const onChangeEOD = (e, record) => {
     let tempData = [...data];
     tempData[record.key - 1].EOD = parseInt(e.target.value);
-    if (e.target.value < vestingMonths) {
-      const newData = {
-        key: data.length + 1,
-        name: `${data.length + 1} Vesting`,
-        FD: 'DivideEqually',
-        EOD: parseInt(vestingMonths),
-        vestPers: displayVesting < 100 ? 100 - displayVesting : 0,
-        LockPeriod: 0
-      };
-      tempData.push(newData);
-    }
-    if (
-      tempData[tempData.length - 1] &&
-      tempData[tempData.length - 2] &&
-      parseInt(tempData[tempData.length - 1].EOD) ===
-        parseInt(tempData[tempData.length - 2].EOD)
-    ) {
-      tempData.pop();
-    } else {
-      setDisplayVesting(
-        displayVesting + tempData[tempData.length - 1].vestPers
-      );
-    }
-    for (let i = 2; i < tempData.length + 1; i++) {
-      if (parseInt(tempData[i - 1].EOD) - 1 === parseInt(tempData[i - 2].EOD)) {
-        tempData[i - 1].FD = 'Fixed';
-      }
-    }
+    // if (e.target.value < vestingMonths) {
+    //   const newData = {
+    //     key: data.length + 1,
+    //     name: `${data.length + 1} Vesting`,
+    //     FD: 'DivideEqually',
+    //     EOD: parseInt(vestingMonths),
+    //     vestPers: displayVesting < 100 ? 100 - displayVesting : 0,
+    //     LockPeriod: 0
+    //   };
+    //   tempData.push(newData);
+    // }
+    // if (
+    //   tempData[tempData.length - 1] &&
+    //   tempData[tempData.length - 2] &&
+    //   parseInt(tempData[tempData.length - 1].EOD) ===
+    //     parseInt(tempData[tempData.length - 2].EOD)
+    // ) {
+    //   tempData.pop();
+    // } else {
+    //   setDisplayVesting(
+    //     displayVesting + tempData[tempData.length - 1].vestPers
+    //   );
+    // }
+    // for (let i = 2; i < tempData.length + 1; i++) {
+    //   if (parseInt(tempData[i - 1].EOD) - 1 === parseInt(tempData[i - 2].EOD)) {
+    //     tempData[i - 1].FD = 'Fixed';
+    //   }
+    // }
     setData(tempData);
   };
 
@@ -219,7 +215,7 @@ const Vesting = props => {
         key: data.length + 1,
         name: `${data.length + 1} Vesting`,
         FD: 'DivideEqually',
-        EOD: 0,
+        EOD: vestingMonths,
         vestPers: parseInt(100 - totalPers),
         LockPeriod: 0
       };
@@ -398,7 +394,14 @@ const Vesting = props => {
             style={{ width: 200 }}
             placeholder='Select a person'
             optionFilterProp='children'
-            value={text}
+            value={
+              data[record.key - 1] &&
+              data[record.key - 2] &&
+              parseInt(data[record.key - 1].EOD) - 1 ===
+                parseInt(data[record.key - 2].EOD)
+                ? 'Fixed'
+                : text
+            }
             onChange={e => onChangeFD(e, record)}
             disabled={
               data[record.key - 1] &&
@@ -429,7 +432,10 @@ const Vesting = props => {
         }
         return (
           <>
-            {record.FD === 'DivideEqually' ? <>{start} - &ensp;</> : null}
+            {record.FD === 'DivideEqually' &&
+            parseInt(start) !== parseInt(record.EOD) ? (
+              <>{start} - &ensp;</>
+            ) : null}
             <InputNumber
               min={parseInt(min)}
               max={vestingMonths}
