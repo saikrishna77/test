@@ -1,12 +1,18 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+// 6Le96dcUAAAAAL_6j4An7EOqhyX9TGqG3w8twjS1
+import React, { useState } from 'react';
 import { Form, Icon, Input, Button, Card, message } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../utils/firebase';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const NormalLoginForm = props => {
   const [err, setError] = React.useState();
   const [loading, setLoading] = React.useState(false);
+  const _reCaptchaRef = React.createRef();
+  const [load, setLoad] = useState(false);
+  const [expired, setExpired] = useState(true);
+
   const handleSubmit = e => {
     e.preventDefault();
     props.form.validateFields(async (err, values) => {
@@ -79,6 +85,18 @@ const NormalLoginForm = props => {
       }
     });
   };
+
+  const asyncScriptOnLoad = () => {
+    console.log('scriptLoad - reCaptcha Ref-', _reCaptchaRef);
+  };
+
+  const handleCaptchaChange = value => {
+    console.log('Captcha value:', value);
+    setExpired(false);
+    // if value is null recaptcha expired
+    if (value === null) setExpired(true);
+  };
+
   const { getFieldDecorator } = props.form;
   return (
     <Card
@@ -156,6 +174,18 @@ const NormalLoginForm = props => {
             />
           )}
         </Form.Item>
+        <div style={{ marginTop: '30px' }}>
+          <ReCAPTCHA
+            style={{
+              display: 'inline-block'
+            }}
+            theme='white'
+            ref={_reCaptchaRef}
+            sitekey={'6Le96dcUAAAAAL_6j4An7EOqhyX9TGqG3w8twjS1'}
+            onChange={handleCaptchaChange}
+            asyncScriptOnLoad={asyncScriptOnLoad}
+          />
+        </div>
         <Form.Item>
           <a className='login-form-forgot' href=''>
             Forgot password
@@ -166,6 +196,7 @@ const NormalLoginForm = props => {
             htmlType='submit'
             className='login-form-button'
             loading={loading}
+            disabled={expired}
           >
             Log in
           </Button>
