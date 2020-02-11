@@ -12,13 +12,18 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import './compliance.css';
 import firebase from '../../utils/firebase';
+import countryArray from '../../newJSON'
 const storage = firebase.storage();
 const { Option } = Select;
 const { Text } = Typography;
+const cArray = countryArray;
+
 export default class ComplianceForm extends React.Component {
+  
   constructor(props) {
     super(props);
     this.state = {
+      errFlag:'',
       current: 0,
       country: '',
       fName: '',
@@ -66,10 +71,18 @@ export default class ComplianceForm extends React.Component {
 
   async save_Data() {
     this.setState({ loading: true });
+    if(this.docupload === ' '|| this.docproofupload ===' '||this.faceUpload === ' '||this.dob === ''||this.country === ' '||this.fName === ' '||this.mName=== ' '||this.lName=== ' '){
+      this.setState({errFlag:'Please make sure you enter all neccesary documents'});
+      console.log('in')
+      return;
+    }else{
     try {
+      console.log('in body  ')
+
       let data = this.state;
       delete data.current;
       delete data.loading;
+      delete data.errFlag;
       await this.fileUpload(data.docproofupload, data.fName);
       await this.fileUpload(data.docupload, data.fName);
       await this.fileUpload(data.faceUpload, data.fName);
@@ -95,7 +108,7 @@ export default class ComplianceForm extends React.Component {
         'data has been not been saved',
         `data has been not been saved`
       );
-    }
+    }}
   }
 
   async fileUpload(fileName, name) {
@@ -117,18 +130,14 @@ export default class ComplianceForm extends React.Component {
         >
           <Select
             style={{ width: '80%' }}
-            placeholder='please select a state'
+            placeholder='please select a country'
             onChange={e => this.setState({ country: e })}
           >
-            <Option key='India' value='India'>
-              India
-            </Option>
-            <Option key='Canada' value='Canada'>
-              Canada
-            </Option>
-            <Option key='America' value='America'>
-              America
-            </Option>
+             { cArray.map(
+                   (item)=>{
+                     return (<Option key={item} value={item}>{item}</Option>);
+                    })}
+            
           </Select>
         </Card>
         <br></br>
@@ -207,6 +216,7 @@ export default class ComplianceForm extends React.Component {
             <br></br>
             <Row style={{ display: 'flex' }}>
               <Input
+              type="number"
                 placeholder='Postal/Zip Code'
                 onChange={e => this.setState({ postal: e.target.value })}
               />
@@ -216,15 +226,11 @@ export default class ComplianceForm extends React.Component {
                 placeholder='please select a country'
                 onChange={e => this.setState({ pcountry: e })}
               >
-                <Option key='India' value='India'>
-                  India
-                </Option>
-                <Option key='Canada' value='Canada'>
-                  Canada
-                </Option>
-                <Option key='America' value='America'>
-                  America
-                </Option>
+                { cArray.map(
+                   (item)=>{
+                     return (<Option key={item} value={item}>{item}</Option>);
+                    })}
+               
               </Select>
             </Row>
             <br></br>
@@ -265,6 +271,7 @@ export default class ComplianceForm extends React.Component {
                 {' '}
                 <Input
                   add='*'
+                  type="number"
                   placeholder='Postal/Zip Code'
                   onChange={e => this.setState({ perpostal: e.target.value })}
                 />
@@ -273,15 +280,11 @@ export default class ComplianceForm extends React.Component {
                   placeholder='please select a country'
                   onChange={e => this.setState({ percountry: e })}
                 >
-                  <Option key='India' value='India'>
-                    India
-                  </Option>
-                  <Option key='Canada' value='Canada'>
-                    Canada
-                  </Option>
-                  <Option key='America' value='America'>
-                    America
-                  </Option>
+                  { cArray.map(
+                   (item)=>{
+                     return (<Option key={item} value={item}>{item}</Option>);
+                    })}
+                  
                 </Select>
               </Row>
             </Row>
@@ -301,12 +304,14 @@ export default class ComplianceForm extends React.Component {
           <br></br>
           <Row style={{ display: 'flex' }}>
             <Input
+            type="number"
               add='*'
               placeholder='Area  Code'
               onChange={e => this.setState({ phone_area: e.target.value })}
             />
             -
             <Input
+            type="number"
               add='*'
               placeholder='Phone Number'
               onChange={e => this.setState({ phone_num: e.target.value })}
@@ -317,6 +322,7 @@ export default class ComplianceForm extends React.Component {
             * Email Address :
           </Text>
           <Input
+          type="email"
             add='*'
             placeholder='Email Address '
             onChange={e => this.setState({ email: e.target.value })}
@@ -358,15 +364,11 @@ export default class ComplianceForm extends React.Component {
             placeholder='please Document issue Country'
             onChange={e => this.setState({ docissuecon: e })}
           >
-            <Option key='India' value='India'>
-              India
-            </Option>
-            <Option key='Canada' value='Canada'>
-              Canada
-            </Option>
-            <Option key='America' value='America'>
-              America
-            </Option>
+           { cArray.map(
+                   (item)=>{
+                     return (<Option key={item} value={item}>{item}</Option>);
+                    })}
+            
           </Select>
           <br></br>
           <br></br>
@@ -413,6 +415,7 @@ export default class ComplianceForm extends React.Component {
             />
           </Row>
           <Row>
+            <Text>{this.errFlag}</Text>
             <br></br>
             <Button
               style={{ marginLeft: '10px' }}

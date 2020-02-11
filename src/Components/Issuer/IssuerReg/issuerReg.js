@@ -16,13 +16,17 @@ import {
   Radio,
   Modal
 } from 'antd';
-// import axios from 'axios';
-const storage = firebase.storage();
+import fs from 'fs';
+import countryArray from '../../../newJSON';
 const { Option } = Select;
 const { Text } = Typography;
 const { TextArea } = Input;
 
 const Registration = props => {
+  const cArray = countryArray;
+  console.log(cArray);
+  const storage = firebase.storage();
+
   const [errFlag, setErrFlag] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState(false);
@@ -32,7 +36,7 @@ const Registration = props => {
   const [createFlag, setCreateFlag] = useState(false);
   const [boardFlag, setBoardFlag] = useState(false);
   const [zipFlag, setZipFlag] = useState(false);
-  const [saved,setSaved] = useState(false);
+  const [saved, setSaved] = useState(false);
   let [regulationFlag, setregulationFlag] = useState(false);
   const openNotificationWithIcon = (type, message, description) => {
     notification[type]({
@@ -242,7 +246,7 @@ const Registration = props => {
   const save_mid_boardData = () => {
     setBoardFlag(true);
     setTimeout(() => {
-      setSaved(true)
+      setSaved(true);
       setBoardFlag(false);
     }, 2000);
   };
@@ -325,9 +329,11 @@ const Registration = props => {
                   defaultValue='please select a country'
                   style={{ width: '100%' }}
                 >
-                  <Option key='India'>India</Option>
-                  <Option key='Afghanistan'>Afghanistan</Option>
-                  <Option key='Bangladesh'> Bangladesh</Option>
+                 { cArray.map(
+                   (item)=>{
+                     return (<Option key={item} value={item}>{item}</Option>);
+                    })}
+                 
                 </Select>
               </Form.Item>
               <Form.Item label='* Company Registered State'>
@@ -446,7 +452,7 @@ const Registration = props => {
                         style={{ marginLeft: '10px' }}
                         type='primary'
                       >
-                        {boardFlag ? 'Saving' :(saved?'Saved': 'Save')}
+                        {boardFlag ? 'Saving' : saved ? 'Saved' : 'Save'}
                       </Button>
                     </div>
                   </Form.Item>
