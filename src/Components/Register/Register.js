@@ -1,6 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { Form, Input, Button, Card, Modal, message, DatePicker } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Modal,
+  message,
+  DatePicker,
+  Select
+} from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { MetamaskService } from '../../utils/metamask';
 import firebase from '../../utils/firebase';
@@ -18,7 +27,8 @@ class RegistrationForm extends React.Component {
       this.setState({ setError: false });
     };
     this.props.form.validateFieldsAndScroll(async (err, values) => {
-      if (!err) {
+      console.log(values);
+      if (false) {
         this.setState({ loading: true });
         let msg = await MetamaskService();
         if (msg === 'Install metamask') {
@@ -106,6 +116,14 @@ class RegistrationForm extends React.Component {
       callback(
         'make sure the password contains 1 number, 1 lowercase, 1 uppercase and 1 special character and 8 characters long'
       );
+    } else {
+      callback();
+    }
+  };
+
+  validatePhoneNumber = (rule, value, callback) => {
+    if (value.toString().length > 10) {
+      callback('Mobile number cannot be more than 10 digits');
     } else {
       callback();
     }
@@ -220,8 +238,10 @@ class RegistrationForm extends React.Component {
               rules: [
                 {
                   required: true,
-                  message: 'Please input your Phone Number!',
-                  whitespace: true
+                  message: 'Please input your Phone Number!'
+                },
+                {
+                  validator: this.validatePhoneNumber
                 }
               ]
             })(<Input type='number' />)}
@@ -246,7 +266,7 @@ class RegistrationForm extends React.Component {
                   whitespace: true
                 }
               ]
-            })(<Input type='number' />)}
+            })(<Input addonBefore='$' type='number' />)}
           </Form.Item>
           <Form.Item label='Underlying Asset'>
             {getFieldDecorator('UnderlyingAsset', {
@@ -257,7 +277,16 @@ class RegistrationForm extends React.Component {
                   whitespace: true
                 }
               ]
-            })(<Input />)}
+            })(
+              <Select>
+                <Select.Option value='Equity'>Equity</Select.Option>
+                <Select.Option value='Mortgage'>Mortgage</Select.Option>
+                <Select.Option value='Loan'>Loan</Select.Option>
+                <Select.Option value='Real Estate'>Real Estate</Select.Option>
+                <Select.Option value='Rewards'>Rewards</Select.Option>
+                <Select.Option value='Others'>Others</Select.Option>
+              </Select>
+            )}
           </Form.Item>
           <Form.Item label='Tentative Date'>
             {getFieldDecorator('tentativeDate', {

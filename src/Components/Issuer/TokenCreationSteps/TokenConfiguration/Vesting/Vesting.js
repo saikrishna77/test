@@ -11,7 +11,8 @@ import {
   Modal,
   Tooltip,
   Alert,
-  Popconfirm
+  Popconfirm,
+  message
 } from 'antd';
 import firebase from '../../../../../utils/firebase';
 import { withRouter } from 'react-router-dom';
@@ -169,9 +170,8 @@ const Vesting = props => {
     //     parseInt(tempData[tempData.length - 2].EOD)
     // ) {
     //   tempData.pop();
-    // } else {
     //   setDisplayVesting(
-    //     displayVesting + tempData[tempData.length - 1].vestPers
+    //     displayVesting - tempData[tempData.length - 1].vestPers
     //   );
     // }
     // for (let i = 2; i < tempData.length + 1; i++) {
@@ -392,7 +392,7 @@ const Vesting = props => {
           <Select
             showSearch
             style={{ width: 200 }}
-            placeholder='Select a person'
+            placeholder='Select a type'
             optionFilterProp='children'
             value={
               data[record.key - 1] &&
@@ -490,13 +490,21 @@ const Vesting = props => {
       key: data.length + 1,
       name: `${data.length + 1} Vesting`,
       FD: 'DivideEqually',
-      EOD: 0,
+      EOD: vestingMonths,
       vestPers: 0,
       LockPeriod: 0
     };
     let tempData = [...data];
-    tempData.push(newData);
-    setData(tempData);
+    if (data.length > 0 && vestingMonths <= data[data.length - 1].EOD) {
+      message.error(
+        'total vesting months already fullfilled, change end of vesting period to add more rows'
+      );
+    } else if (!vestingMonths) {
+      message.error('first enter total duration of vesting to add row');
+    } else {
+      tempData.push(newData);
+      setData(tempData);
+    }
   };
 
   const handleNextPhase = () => {
