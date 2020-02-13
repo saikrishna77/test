@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
 import { Card, Row, Col, Button, Empty, Spin } from 'antd';
 import Countdown from 'react-countdown';
+import TokenContractInterface from '../../../contract/TokenRegisterContractInterface';
 
 const Tokens = props => {
   const [data, setData] = React.useState([]);
@@ -10,6 +11,17 @@ const Tokens = props => {
 
   React.useEffect(() => {
     firebase.auth().onAuthStateChanged(async function(user) {
+      let ethereum = window['ethereum'];
+      if (typeof ethereum !== 'undefined') {
+        const wallets = await window['ethereum'].enable();
+        let wallet = await wallets[0];
+        console.log(wallet);
+        console.log(
+          await TokenContractInterface.getAllOwnerSymbolsDetailsAndSTData(
+            wallet
+          )
+        );
+      }
       if (user) {
         firebase.analytics();
         const db = firebase.firestore();
@@ -91,8 +103,19 @@ const Tokens = props => {
             >
               <b>Eth Address</b>: {data[i].basicDetails.ethereumAddress}
             </p>
-            <p style={{ textOverflow: 'ellipsis' }}>
-              <b>Contract Transaction: </b>
+            <p
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              <b>TransactionID:</b>{' '}
+              <a
+                href={`https://kovan.etherscan.io/tx/${data[i].basicDetails.transactionHash}`}
+              >
+                {data[i].basicDetails.transactionHash}
+              </a>
             </p>
             <p style={{ textOverflow: 'ellipsis' }}>
               <b>Date</b>:{' '}

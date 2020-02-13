@@ -5,22 +5,23 @@ let ethereum;
 let selectedWallet;
 const MetamaskService = async () => {
   try {
-    // const networkId$;
-    // const selectedToken;
-
     if (typeof window['ethereum'] === 'undefined') {
       console.log('install metamask');
       return 'Install metamask';
     }
     ethereum = window['ethereum'];
     web3 = new Web3(ethereum);
+    const networkType = web3.eth.net.getNetworkType();
+    if(networkType !== 'kovan'){
+      return 'not kovan'
+    }
     const wallets = await ethereum.enable();
     selectedWallet = await wallets[0];
-    console.log(selectedWallet);
     ethereum.on('accountsChanged', accounts => {
       selectedWallet = accounts[0];
       console.log(selectedWallet);
     });
+    return web3;
   } catch (err) {
     console.error(err);
     if (

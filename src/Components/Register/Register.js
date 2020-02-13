@@ -28,7 +28,7 @@ class RegistrationForm extends React.Component {
     };
     this.props.form.validateFieldsAndScroll(async (err, values) => {
       console.log(values);
-      if (false) {
+      if (!err) {
         this.setState({ loading: true });
         let msg = await MetamaskService();
         if (msg === 'Install metamask') {
