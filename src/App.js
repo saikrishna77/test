@@ -10,66 +10,79 @@ import SideBar from './Components/Admin/Sidebar/Sidebar';
 import IssuerSideBar from './Components/Issuer/SideBar/SideBar';
 import Tokens from './Components/Issuer/Tokens/Tokens';
 import firebase from './utils/firebase';
-import ErrorPage from './Components/Issuer/ErrorPage/ErrorPage';
+import ErrorPage from './Components/Issuer/ErrorPages/AdminPendingErrorPage';
+import MetamaskErrorPage from './Components/Issuer/ErrorPages/metamaskErrors';
 import IssuerReg from './Components/Issuer/IssuerReg/issuerReg';
 import ComplianceForm from './Components/Compliance/ComplianceForm';
+import Web3 from 'web3';
 
 function App(props) {
   React.useEffect(() => {
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
-        if (user.emailVerified) {
-          firebase.analytics();
-          const db = firebase.firestore();
-          const doc = await db
-            .collection('users')
-            .doc(user.uid)
-            .get();
-          if (!doc.exists) {
-            console.log('No such document!');
+        let ethereum = window['ethereum'];
+        if (typeof ethereum === 'undefined') {
+          props.history.push('/metamaskError');
+        } else if (typeof ethereum !== 'undefined') {
+          const web3 = new Web3(ethereum);
+          const network = await web3.eth.net.getNetworkType();
+          if (network.toString() !== 'kovan') {
+            props.history.push('/metamaskError');
           } else {
-            console.log(window.location.pathname);
-            if (window.location.pathname === '/') {
-              if (doc.data().role === 'issuer') {
-                if (doc.data().status.adminApproved !== 'approved') {
-                  props.history.push('/pendingRegistrationError');
+            if (user.emailVerified) {
+              firebase.analytics();
+              const db = firebase.firestore();
+              const doc = await db
+                .collection('users')
+                .doc(user.uid)
+                .get();
+              if (!doc.exists) {
+                console.log('No such document!');
+              } else {
+                console.log(window.location.pathname);
+                if (window.location.pathname === '/') {
+                  if (doc.data().role === 'issuer') {
+                    if (doc.data().status.adminApproved !== 'approved') {
+                      props.history.push('/pendingRegistrationError');
+                    } else {
+                      props.history.push('/issuer/tokens');
+                    }
+                  } else if (doc.data().role === 'admin') {
+                    props.history.push('/admin/issuerSuperAdmins');
+                  }
                 } else {
-                  props.history.push('/issuer/tokens');
-                }
-              } else if (doc.data().role === 'admin') {
-                props.history.push('/admin/issuerSuperAdmins');
-              }
-            } else {
-              const subRoute = window.location.pathname
-                .toString()
-                .split('/')[1];
-              if (subRoute === 'issuer') {
-                if (doc.data().role === 'issuer') {
-                  if (doc.data().status.adminApproved !== 'approved') {
-                    props.history.push('/pendingRegistrationError');
+                  const subRoute = window.location.pathname
+                    .toString()
+                    .split('/')[1];
+                  if (subRoute === 'issuer') {
+                    if (doc.data().role === 'issuer') {
+                      if (doc.data().status.adminApproved !== 'approved') {
+                        props.history.push('/pendingRegistrationError');
+                      } else {
+                        props.history.push(
+                          window.location.pathname + props.location.search
+                        );
+                      }
+                    } else {
+                      props.history.push('/login');
+                    }
+                  } else if (subRoute === 'admin') {
+                    if (doc.data().role === 'admin') {
+                      props.history.push(
+                        window.location.pathname + props.location.search
+                      );
+                    } else {
+                      props.history.push('/login');
+                    }
                   } else {
                     props.history.push(
                       window.location.pathname + props.location.search
                     );
                   }
-                } else {
-                  props.history.push('/login');
                 }
-              } else if (subRoute === 'admin') {
-                if (doc.data().role === 'admin') {
-                  props.history.push(
-                    window.location.pathname + props.location.search
-                  );
-                } else {
-                  props.history.push('/login');
-                }
-              } else {
-                props.history.push(
-                  window.location.pathname + props.location.search
-                );
+                console.log('Document data:', doc.data());
               }
             }
-            console.log('Document data:', doc.data());
           }
         }
       } else {
@@ -94,6 +107,11 @@ function App(props) {
           exact
           path='/pendingRegistrationError'
           component={ErrorPage}
+        ></Route>
+        <Route
+          exact
+          path='/metamaskError'
+          component={MetamaskErrorPage}
         ></Route>
         <Route
           exact
@@ -157,7 +175,7 @@ function App(props) {
           render={props => (
             <>
               <IssuerSideBar />
-              <div style={{ marginTop: '6%',marginLeft:'10%' }}>
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
                 <ComplianceForm />
               </div>
             </>
