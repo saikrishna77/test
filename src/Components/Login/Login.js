@@ -24,7 +24,6 @@ const NormalLoginForm = props => {
           let res = await firebase
             .auth()
             .signInWithEmailAndPassword(values.username, values.password);
-          console.log(res.user);
           if (res.user.emailVerified) {
             console.log(res.user.emailVerified);
             console.log('email verified');

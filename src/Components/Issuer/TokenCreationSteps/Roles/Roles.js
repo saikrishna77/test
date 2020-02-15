@@ -22,12 +22,16 @@ const Roles = props => {
         .doc(symbol + '-' + localStorage.getItem('uid'))
         .get()
         .then(snapshot => {
-          console.log(snapshot.data());
-          if (snapshot.data().vestingSchedules) {
-            setVestingNames(Object.keys(snapshot.data().vestingSchedules));
+          try {
+            if (snapshot.data().vestingSchedules) {
+              setVestingNames(Object.keys(snapshot.data().vestingSchedules));
+            }
+            if (snapshot.data().roles) setData(snapshot.data().roles);
+            setLoading(false);
+          } catch (e) {
+            console.log(e);
+            props.history.push('/login');
           }
-          if (snapshot.data().roles) setData(snapshot.data().roles);
-          setLoading(false);
         });
     } else {
       setEdit(false);
