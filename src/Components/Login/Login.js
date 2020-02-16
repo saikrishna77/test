@@ -5,6 +5,7 @@ import { Form, Icon, Input, Button, Card, message } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../utils/firebase';
 import ReCAPTCHA from 'react-google-recaptcha';
+import Web3 from 'web3';
 
 const NormalLoginForm = props => {
   const [err, setError] = React.useState();
@@ -37,16 +38,26 @@ const NormalLoginForm = props => {
             } else {
               localStorage.setItem('uid', res.user.uid);
               localStorage.setItem('email', res.user.email);
-              if (doc.data().role === 'issuer') {
-                if (doc.data().status.adminApproved !== 'approved') {
-                  props.history.push('/pendingRegistrationError');
-                } else {
-                  props.history.push('/issuer/tokens');
+              let ethereum = window['ethereum'];
+              if (typeof ethereum === 'undefined') {
+                props.history.push('/metamaskError');
+              } else if (typeof ethereum !== 'undefined') {
+                const web3 = new Web3(ethereum);
+                const network = await web3.eth.net.getNetworkType();
+                if (network.toString() !== 'kovan') {
+                  props.history.push('/metamaskError');
                 }
-              } else {
-                props.history.push('/admin/issuerSuperAdmins');
+                if (doc.data().role === 'issuer') {
+                  if (doc.data().status.adminApproved !== 'approved') {
+                    props.history.push('/pendingRegistrationError');
+                  } else {
+                    props.history.push('/issuer/tokens');
+                  }
+                } else {
+                  props.history.push('/admin/issuerSuperAdmins');
+                }
+                console.log('Document data:', doc.data());
               }
-              console.log('Document data:', doc.data());
             }
           } else {
             console.log('email not verified');
