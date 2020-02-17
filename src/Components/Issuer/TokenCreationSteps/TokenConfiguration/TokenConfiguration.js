@@ -6,7 +6,7 @@ import Vesting from './Vesting/Vesting';
 import Phase from './Phase/Phase';
 
 const TokenConfig = () => {
-  const [current, setCurrent] = React.useState('phase');
+  const [current, setCurrent] = React.useState('tType');
   const [firebaseTokenID, setFirebaseTokenID] = React.useState();
   const handleClick = e => {
     console.log('click ', e);

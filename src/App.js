@@ -14,6 +14,7 @@ import ErrorPage from './Components/Issuer/ErrorPages/AdminPendingErrorPage';
 import MetamaskErrorPage from './Components/Issuer/ErrorPages/metamaskErrors';
 import IssuerReg from './Components/Issuer/IssuerReg/issuerReg';
 import ComplianceForm from './Components/Compliance/ComplianceForm';
+import TokenDeploy from './Components/Issuer/TokenCreationSteps/tokenDeploy';
 import Web3 from 'web3';
 
 function App(props) {
@@ -103,6 +104,7 @@ function App(props) {
       <Switch>
         <Route exact path='/register' component={RegisterFormComp}></Route>
         <Route exact path='/login' component={LoginForm}></Route>
+        <Route exact path='/tokenDeploy' component={TokenDeploy}></Route>
         <Route
           exact
           path='/pendingRegistrationError'
