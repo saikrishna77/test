@@ -59,13 +59,16 @@ const TokenPhase = props => {
             {allPhaseNames}
           </Select>
           <div>
-            <b>Phase Name:</b>{phaseName}
+            <b>Phase Name:</b>
+            {phaseName}
           </div>
           <div>
-            <b>Phase Start Date:</b>{new Date(phaseStart).toLocaleDateString()}
+            <b>Phase Start Date:</b>
+            {new Date(phaseStart * 1000).toLocaleDateString()}
           </div>
           <div>
-            <b>Phase End Date:</b>{new Date(phaseEnd).toLocaleDateString()}
+            <b>Phase End Date:</b>
+            {new Date(phaseEnd * 1000).toLocaleDateString()}
           </div>
           <Table
             size='small'
