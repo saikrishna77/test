@@ -89,7 +89,7 @@ const Phase = props => {
               placement: 'topRight'
             });
             setSetNextModal(false);
-            window.location.href = '/issuer/tokens';
+            window.location.href = '/tokenDeploy?symbol=' + symbol;
           })
           .catch(err => {
             setSetNextModal(false);

@@ -33,61 +33,67 @@ const ReserveToken = props => {
   }, [ethereum]);
 
   const submit = async symbol => {
-    setLoading(true);
-    firebase.analytics();
-    const db = firebase.firestore();
-    let resp = await db
-      .collection('reservedTokenSymbols')
-      .where('basicDetails.symbol', '==', symbol)
-      .get();
-    if (resp.empty) {
-      const available = await tokenSymbolAvailable(symbol);
-      if (!available) {
+    if (symbol.indexOf(' ') < 0) {
+      setLoading(true);
+      firebase.analytics();
+      const db = firebase.firestore();
+      let resp = await db
+        .collection('reservedTokenSymbols')
+        .where('basicDetails.symbol', '==', symbol)
+        .get();
+      if (resp.empty) {
+        const available = await tokenSymbolAvailable(symbol);
+        if (!available) {
+          Modal.error({
+            title: 'Token Symbol already registered',
+            content:
+              'The Token Symbol has been registered, you can try different token symbol'
+          });
+          setLoading(false);
+        } else {
+          let ethereum = window['ethereum'];
+          if (typeof ethereum !== 'undefined') {
+            const wallets = await window['ethereum'].enable();
+            let wallet = await wallets[0];
+            const res = await reserveTokenSymbol(wallet, symbol);
+            await db
+              .collection('reservedTokenSymbols')
+              .doc(symbol + '-' + localStorage.getItem('uid'))
+              .set({
+                basicDetails: {
+                  issuer: localStorage.getItem('uid'),
+                  email: localStorage.getItem('email'),
+                  symbolCreationTime: Date.now(),
+                  symbol: symbol,
+                  ethereumAddress: selectedWallet,
+                  transactionHash: res.transactionHash
+                }
+              });
+            setLoading(false);
+            props.history.push('/issuer/tokenCreation/roles?symbol=' + symbol);
+          } else {
+            Modal.error({
+              title: 'Metamask not installed',
+              content: 'Please install metamask to register the token.'
+            });
+            setLoading(false);
+          }
+        }
+      } else {
         Modal.error({
           title: 'Token Symbol already registered',
           content:
             'The Token Symbol has been registered, you can try different token symbol'
         });
         setLoading(false);
-      } else {
-        let ethereum = window['ethereum'];
-        if (typeof ethereum !== 'undefined') {
-          const wallets = await window['ethereum'].enable();
-          let wallet = await wallets[0];
-          const res = await reserveTokenSymbol(wallet, symbol);
-          await db
-            .collection('reservedTokenSymbols')
-            .doc(symbol + '-' + localStorage.getItem('uid'))
-            .set({
-              basicDetails: {
-                issuer: localStorage.getItem('uid'),
-                email: localStorage.getItem('email'),
-                symbolCreationTime: Date.now(),
-                symbol: symbol,
-                ethereumAddress: selectedWallet,
-                transactionHash: res.transactionHash
-              }
-            });
-          setLoading(false);
-          props.history.push('/issuer/tokenCreation/roles?symbol=' + symbol);
-        } else {
-          Modal.error({
-            title: 'Metamask not installed',
-            content: 'Please install metamask to register the token.'
-          });
-          setLoading(false);
-        }
       }
+      setLoading(false);
+      // setTokenReserved(!tokenReserved);
     } else {
       Modal.error({
-        title: 'Token Symbol already registered',
-        content:
-          'The Token Symbol has been registered, you can try different token symbol'
+        title: 'Token Symbol Cannot contain spaces'
       });
-      setLoading(false);
     }
-    setLoading(false);
-    // setTokenReserved(!tokenReserved);
   };
 
   //look for changes in ethereum account

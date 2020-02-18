@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Select, Table } from 'antd';
 
-const TokenPhase = () => {
+const TokenPhase = props => {
   const [show, setShow] = useState(false);
-  const dataSource = [
-    {
-      key: '1',
-      minInvAmt: '1000',
-      bonus: '12'
-    },
-    {
-      key: '2',
-      minInvAmt: '20000',
-      bonus: '36'
+  const [allPhaseNames, setAllPhaseNames] = useState([]);
+  const [phaseName, setPhaseName] = useState('');
+  const [phaseStart, setPhaseStart] = useState();
+  const [phaseEnd, setPhaseEnd] = useState();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    console.log(props.data);
+    const arr = [];
+    for (const key in props.data) {
+      arr.push(
+        <Select.Option key={key} value={key}>
+          {key}
+        </Select.Option>
+      );
     }
-  ];
+    setAllPhaseNames(arr);
+  }, [props.data]);
 
   const columns = [
     {
       title: 'Minimum Investment Amount',
-      dataIndex: 'minInvAmt',
-      key: 'minInvAmt'
+      dataIndex: 'investmentAmount',
+      key: 'investmentAmount'
     },
     {
       title: '% Bonus',
@@ -28,6 +34,13 @@ const TokenPhase = () => {
       key: 'bonus'
     }
   ];
+
+  const onChangePhaseName = value => {
+    setPhaseName(value);
+    setPhaseStart(props.data[value].phaseStartDate);
+    setPhaseEnd(props.data[value].phaseEndDate);
+    setData(props.data[value].data);
+  };
 
   return (
     <div>
@@ -42,29 +55,22 @@ const TokenPhase = () => {
       </Card>
       {show ? (
         <Card style={{ width: '50%', margin: 'auto' }}>
-          <Select value='36'>
-            <Select.Option key='2' value='36'>
-              {' '}
-              36 months{' '}
-            </Select.Option>
-            <Select.Option key='3' value='36'>
-              {' '}
-              26 months{' '}
-            </Select.Option>
+          <Select style={{ width: '200px' }} onChange={onChangePhaseName}>
+            {allPhaseNames}
           </Select>
           <div>
-            <b>Phase Name:</b>XYZ
+            <b>Phase Name:</b>{phaseName}
           </div>
           <div>
-            <b>Phase Start Date:</b>30/01/2020
+            <b>Phase Start Date:</b>{new Date(phaseStart).toLocaleDateString()}
           </div>
           <div>
-            <b>Phase End Date:</b>1/02/2020
+            <b>Phase End Date:</b>{new Date(phaseEnd).toLocaleDateString()}
           </div>
           <Table
             size='small'
             ellipsis={false}
-            dataSource={dataSource}
+            dataSource={data}
             columns={columns}
             pagination={false}
           />

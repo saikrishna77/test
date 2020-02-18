@@ -1,31 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Select, Table } from 'antd';
 
-const TokenVesting = () => {
+const TokenVesting = props => {
   const [show, setShow] = useState(false);
+  const [allVestingNames, setAllVestingNames] = useState();
+  const [vestingName, setVestingName] = useState('');
+  const [vestingPeriod, setVestingPeriod] = useState();
+  const [data, setData] = useState([]);
 
-  const dataSource = [
-    {
-      key: '1',
-      vestingType: 'Fixed',
-      EOD: '12',
-      vestingPer: '36 months',
-      lockPeriod: '23'
-    },
-    {
-      key: '2',
-      vestingType: 'Divide equally',
-      EOD: '36',
-      vestingPer: '12 months',
-      lockPeriod: '25'
+  useEffect(() => {
+    console.log(props.data);
+    const arr = [];
+    for (const key in props.data) {
+      arr.push(
+        <Select.Option key={key} value={key}>
+          {key}
+        </Select.Option>
+      );
     }
-  ];
+    setAllVestingNames(arr);
+  }, [props.data]);
+
+  const onChangeVestingName = value => {
+    setVestingName(value);
+    setVestingPeriod(props.data[value].totalVestingMonths);
+    setData(props.data[value].data);
+  };
 
   const columns = [
     {
       title: 'Vesting Type',
-      dataIndex: 'vestingType',
-      key: 'vestingType'
+      dataIndex: 'FD',
+      key: 'FD'
     },
     {
       title: 'End Of vesting month',
@@ -34,13 +40,13 @@ const TokenVesting = () => {
     },
     {
       title: 'Vesting Percentage',
-      dataIndex: 'vestingPer',
-      key: 'vestingPer'
+      dataIndex: 'vestPers',
+      key: 'vestPers'
     },
     {
       title: 'Lock Period',
-      dataIndex: 'lockPeriod',
-      key: 'lockPeriod'
+      dataIndex: 'LockPeriod',
+      key: 'LockPeriod'
     }
   ];
 
@@ -59,26 +65,21 @@ const TokenVesting = () => {
       </Card>
       {show ? (
         <Card style={{ width: '50%', margin: 'auto' }}>
-          <Select value='36'>
-            <Select.Option key='2' value='36'>
-              {' '}
-              36 months{' '}
-            </Select.Option>
-            <Select.Option key='3' value='36'>
-              {' '}
-              26 months{' '}
-            </Select.Option>
+          <Select style={{ width: '200px' }} onChange={onChangeVestingName}>
+            {allVestingNames}
           </Select>
           <div>
-            <b>Vesting Name:</b>36 months
+            <b>Vesting Name:</b>
+            {vestingName}
           </div>
           <div>
-            <b>Vesting Period:</b>36
+            <b>Vesting Period:</b>
+            {vestingPeriod} months
           </div>
           <Table
             size='small'
             ellipsis={false}
-            dataSource={dataSource}
+            dataSource={data}
             columns={columns}
             pagination={false}
           />

@@ -1,23 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Table } from 'antd';
 
-const TokenRoles = () => {
+const TokenRoles = props => {
   const [show, setShow] = useState(false);
-
-  const dataSource = [
-    {
-      key: '1',
-      role: 'Employee',
-      roleType: 'Manager',
-      vestingSchedule: '36 months'
-    },
-    {
-      key: '2',
-      role: 'Affiliate',
-      roleType: 'Developer',
-      vestingSchedule: '12 months'
-    }
-  ];
 
   const columns = [
     {
@@ -32,8 +17,8 @@ const TokenRoles = () => {
     },
     {
       title: 'Vesting Schedule',
-      dataIndex: 'vestingSchedule',
-      key: 'vestingSchedule'
+      dataIndex: 'vesting',
+      key: 'vesting'
     }
   ];
 
@@ -53,7 +38,7 @@ const TokenRoles = () => {
           <Table
             size='small'
             ellipsis={false}
-            dataSource={dataSource}
+            dataSource={props.data ? props.data : []}
             columns={columns}
             pagination={false}
           />
