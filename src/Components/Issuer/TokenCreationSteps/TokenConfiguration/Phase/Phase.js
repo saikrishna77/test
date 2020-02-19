@@ -275,9 +275,7 @@ const Phase = props => {
 
   const onSubmit = () => {
     let zeroFlag = false;
-    let totalBonus = 0;
     data.forEach(e => {
-      totalBonus += e.bonus;
       if (e.bonus <= 0 || e.investmentAmount <= 0) {
         zeroFlag = true;
       }
@@ -285,8 +283,6 @@ const Phase = props => {
 
     if (!phaseName) {
       message.error(`phase name missing`);
-    } else if (totalBonus !== 100) {
-      message.error('total bonus is not 100%');
     } else if (
       phaseName.includes('~') ||
       phaseName.includes('*') ||
