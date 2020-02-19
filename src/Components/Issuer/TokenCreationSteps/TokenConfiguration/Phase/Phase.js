@@ -79,7 +79,7 @@ const Phase = props => {
               phaseStartDate: phaseStartDate.unix(),
               phaseEndDate: phaseEndDate.unix(),
               data: data,
-              phaseNmae: phaseName
+              phaseName: phaseName
             }
           })
           .then(res => {
@@ -115,7 +115,7 @@ const Phase = props => {
                 phaseStartDate: phaseStartDate.unix(),
                 phaseEndDate: phaseEndDate.unix(),
                 data: data,
-                phaseNmae: phaseName
+                phaseName: phaseName
               }
             })
             .then(res => {
@@ -142,7 +142,7 @@ const Phase = props => {
                   phaseStartDate: phaseStartDate.unix(),
                   phaseEndDate: phaseEndDate.unix(),
                   data: data,
-                  phaseNmae: phaseName
+                  phaseName: phaseName
                 }
               }
             })
@@ -275,8 +275,9 @@ const Phase = props => {
 
   const onSubmit = () => {
     let zeroFlag = false;
-
+    let totalBonus = 0;
     data.forEach(e => {
+      totalBonus += e.bonus;
       if (e.bonus <= 0 || e.investmentAmount <= 0) {
         zeroFlag = true;
       }
@@ -284,6 +285,8 @@ const Phase = props => {
 
     if (!phaseName) {
       message.error(`phase name missing`);
+    } else if (totalBonus !== 100) {
+      message.error('total bonus is not 100%');
     } else if (
       phaseName.includes('~') ||
       phaseName.includes('*') ||
@@ -306,16 +309,15 @@ const Phase = props => {
 
   const editPhaseNameChange = e => {
     console.log(e);
+    console.log(editData[e].data);
     setData(editData[e].data);
     setPhaseName(editData[e].phaseName);
-    setPhaseStartDate(editData[e].phaseStartDate);
-    setPhaseEndDate(editData[e].phaseEndDate);
   };
 
   return (
     <>
       {setNextModal ? DisplayModal() : null}
-      {/* {editMode ? (
+      {editMode ? (
         <>
           <b>Select a phase to edit</b>
           <Select style={{ width: '190px' }} onChange={editPhaseNameChange}>
@@ -323,12 +325,16 @@ const Phase = props => {
           </Select>
           <br />
         </>
-      ) : null} */}
+      ) : null}
       <div style={{ margin: 'auto', textAlign: 'center' }}>
         <div style={{ display: 'inline-block' }}>
           Enter the name of the phase:
           <div style={{ width: '200px' }}>
-            <Input value={phaseName} onChange={nameChangeHandle} />
+            <Input
+              value={phaseName}
+              onChange={nameChangeHandle}
+              disabled={editMode}
+            />
           </div>
         </div>
         <div>
