@@ -7,6 +7,7 @@ const TokenDetails = props => {
 
   useEffect(() => {
     if (props.data) {
+      console.log(props.data);
       const type = props.data.typeOfSecurity;
       if (type === 'EBS') {
         const sub = props.data.typeOfSecuritysub;
@@ -49,9 +50,10 @@ const TokenDetails = props => {
           setSecurityType('Preferred stock series-B');
         } else if (sub === 'PSC') {
           setSecurityType('Preferred stock series-C');
-        } else {
-          setSecurityType(type);
         }
+      } else {
+        setSecurityType(props.data.typeOfSecurity);
+        console.log(securityType);
       }
     }
   }, [props.data]);

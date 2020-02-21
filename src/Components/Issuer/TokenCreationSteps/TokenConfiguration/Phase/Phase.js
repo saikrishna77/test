@@ -326,10 +326,7 @@ const Phase = props => {
         <div style={{ display: 'inline-block' }}>
           Enter the name of the phase:
           <div style={{ width: '200px' }}>
-            <Input
-              value={phaseName}
-              onChange={nameChangeHandle}
-            />
+            <Input value={phaseName} onChange={nameChangeHandle} />
           </div>
         </div>
         <div>
@@ -371,6 +368,20 @@ const Phase = props => {
           <Button type={'primary'} onClick={onSubmit}>
             Submit Phase
           </Button>
+          {editMode ? (
+            <Button
+              type='primary'
+              onClick={() => {
+                const search = props.location.search;
+                const params = new URLSearchParams(search);
+                const symbol = params.get('symbol');
+                window.location.href = '/tokenDeploy?symbol=' + symbol;
+              }}
+              style={{ marginLeft: '30px' }}
+            >
+              Next
+            </Button>
+          ) : null}
         </div>
       </div>
     </>

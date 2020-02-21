@@ -14,7 +14,7 @@ const Roles = props => {
     const search = props.location.search;
     const params = new URLSearchParams(search);
     const symbol = params.get('symbol');
-    if (params.get('edit')) {
+    if (params.get('edit') || params.get('setVesting')) {
       setEdit(true);
       setLoading(true);
       const db = firebase.firestore();
@@ -73,6 +73,12 @@ const Roles = props => {
     if (params.get('edit')) {
       props.history.push(
         '/issuer/tokenCreation/tokenConfig?symbol=' + symbol + '&edit=true'
+      );
+    } else if (params.get('setVesting')) {
+      props.history.push(
+        '/issuer/tokenCreation/tokenConfig?symbol=' +
+          symbol +
+          '&doneVesting=true'
       );
     } else {
       props.history.push('/issuer/tokenCreation/tokenConfig?symbol=' + symbol);

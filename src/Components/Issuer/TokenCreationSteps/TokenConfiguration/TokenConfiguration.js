@@ -4,10 +4,18 @@ import TokenType from './TokenType/TokenType';
 import { Row, Icon } from 'antd';
 import Vesting from './Vesting/Vesting';
 import Phase from './Phase/Phase';
+import { withRouter } from 'react-router-dom';
 
-const TokenConfig = () => {
+const TokenConfig = props => {
   const [current, setCurrent] = React.useState('tType');
   const [firebaseTokenID, setFirebaseTokenID] = React.useState();
+  React.useEffect(() => {
+    const search = props.location.search;
+    const params = new URLSearchParams(search);
+    if (params.get('doneVesting')) {
+      setCurrent('phase');
+    }
+  });
   const handleClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
@@ -73,4 +81,4 @@ const TokenConfig = () => {
   );
 };
 
-export default TokenConfig;
+export default withRouter(TokenConfig);

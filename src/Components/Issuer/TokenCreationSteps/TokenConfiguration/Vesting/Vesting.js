@@ -279,7 +279,12 @@ const Vesting = props => {
               placement: 'topRight'
             });
             setLoading(false);
-            props.NextTab('phase');
+            if (editMode) {
+              props.NextTab('phase');
+            } else {
+              window.location.href =
+                '/issuer/tokenCreation/roles?symbol=' + symbol + '&setVesting=true';
+            }
           })
           .catch(err => {
             notification.error({
