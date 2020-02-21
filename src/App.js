@@ -104,7 +104,6 @@ function App(props) {
       <Switch>
         <Route exact path='/register' component={RegisterFormComp}></Route>
         <Route exact path='/login' component={LoginForm}></Route>
-        <Route exact path='/tokenDeploy' component={TokenDeploy}></Route>
         <Route
           exact
           path='/pendingRegistrationError'
@@ -114,6 +113,18 @@ function App(props) {
           exact
           path='/metamaskError'
           component={MetamaskErrorPage}
+        ></Route>
+        <Route
+          exact
+          path='/tokenDeploy'
+          render={props => (
+            <>
+              <IssuerSideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <TokenDeploy />
+              </div>
+            </>
+          )}
         ></Route>
         <Route
           exact

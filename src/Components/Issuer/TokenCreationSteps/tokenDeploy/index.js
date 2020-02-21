@@ -5,6 +5,7 @@ import TokenRoles from './tokenRoles';
 import TokenVesting from './tokenVesting';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../../utils/firebase';
+import { Button } from 'antd';
 
 const TokenDisplay = props => {
   const [tokenDetails, setTokenDetails] = useState({});
@@ -82,7 +83,7 @@ const TokenDisplay = props => {
           <div>
             <b>Token Sybmol Reserved contract hash</b>:
             <a
-              href={`https://kovan.etherscan.io/${basicDetails.transactionHash}`}
+              href={`https://kovan.etherscan.io/tx/${basicDetails.transactionHash}`}
             >
               {basicDetails.transactionHash}
             </a>
@@ -91,6 +92,22 @@ const TokenDisplay = props => {
           <TokenRoles data={roles} />
           <TokenVesting data={vesting} />
           <TokenPhase data={phase} />
+          <div style={{ marginTop: '10px' }}>
+            <Button style={{ margin: '10px' }} type='primary'>
+              Deploy
+            </Button>
+            <Button
+              style={{ margin: '10px' }}
+              onClick={() => {
+                props.history.push(
+                  '/issuer/tokenCreation/roles?symbol=' + symbol + '&edit=true'
+                );
+              }}
+              type='primary'
+            >
+              Edit Configuration
+            </Button>
+          </div>
         </div>
       )}
     </>

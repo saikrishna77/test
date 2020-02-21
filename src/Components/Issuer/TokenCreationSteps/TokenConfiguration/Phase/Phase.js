@@ -329,7 +329,6 @@ const Phase = props => {
             <Input
               value={phaseName}
               onChange={nameChangeHandle}
-              disabled={editMode}
             />
           </div>
         </div>
