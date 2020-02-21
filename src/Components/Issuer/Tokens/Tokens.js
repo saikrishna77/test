@@ -16,11 +16,11 @@ const Tokens = props => {
         const wallets = await window['ethereum'].enable();
         let wallet = await wallets[0];
         console.log(wallet);
-        console.log(
-          await TokenContractInterface.getAllOwnerSymbolsDetailsAndSTData(
-            wallet
-          )
-        );
+        // console.log(
+        //   await TokenContractInterface.getAllOwnerSymbolsDetailsAndSTData(
+        //     wallet
+        //   )
+        // );
       }
       if (user) {
         firebase.analytics();
@@ -64,16 +64,18 @@ const Tokens = props => {
     } else {
       // Render a countdown
       return (
-        // <div style={{fontSize: '40px'}}>{hours}</div>
-        <div style={{ color: '#db5e56', fontSize: '20px' }}>
-          <b>{days}</b> days
-          <br />
-          <b>{hours}</b> hours
-          <br />
-          <b>{minutes}</b> minutes
-          <br />
-          {seconds}
-        </div>
+        <>
+          Your token expires in
+          <div style={{ color: '#db5e56', fontSize: '20px' }}>
+            <b>{days}</b> days
+            <br />
+            <b>{hours}</b> hours
+            <br />
+            <b>{minutes}</b> minutes
+            <br />
+            {seconds}
+          </div>
+        </>
       );
     }
   };
@@ -91,7 +93,8 @@ const Tokens = props => {
               width: '300px',
               color: 'black',
               boxShadow: '10px 10px 8px #888888',
-              textAlign: 'left'
+              textAlign: 'left',
+              height: '400px'
             }}
           >
             <p
@@ -123,28 +126,64 @@ const Tokens = props => {
                 data[i].basicDetails.symbolCreationTime
               ).toLocaleDateString()}{' '}
             </p>
-            <div>
-              Your token expires in
-              <Countdown
-                date={data[i].basicDetails.symbolCreationTime + 1.296e9}
-                renderer={renderer}
-              ></Countdown>
-            </div>
-            <Button
-              type='primary'
-              disabled={
-                Date.now() > data[i].basicDetails.symbolCreationTime + 1.296e9
-              }
-              onClick={() => {
-                props.history.push(
-                  '/issuer/tokenCreation/roles?symbol=' +
-                    data[i].basicDetails.symbol +
-                    '&edit=true'
-                );
-              }}
-            >
-              Configure
-            </Button>
+            {data[i].deployed ? (
+              <>
+                Your Token is deployed{' '}
+                <p
+                  style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  <b>Deploy TransactionID:</b>{' '}
+                  <a
+                    href={`https://kovan.etherscan.io/tx/${data[i].deployAddress}`}
+                  >
+                    {data[i].deployAddress}
+                  </a>
+                </p>
+                <Button
+                  type='primary'
+                  disabled={
+                    Date.now() >
+                    data[i].basicDetails.symbolCreationTime + 1.296e9
+                  }
+                  onClick={() => {
+                    props.history.push(
+                      '/tokenDeploy?symbol=' + data[i].basicDetails.symbol
+                    );
+                  }}
+                >
+                  Check Token Details
+                </Button>
+              </>
+            ) : (
+              <>
+                <div>
+                  <Countdown
+                    date={data[i].basicDetails.symbolCreationTime + 1.296e9}
+                    renderer={renderer}
+                  ></Countdown>
+                </div>
+                <Button
+                  type='primary'
+                  disabled={
+                    Date.now() >
+                    data[i].basicDetails.symbolCreationTime + 1.296e9
+                  }
+                  onClick={() => {
+                    props.history.push(
+                      '/issuer/tokenCreation/roles?symbol=' +
+                        data[i].basicDetails.symbol +
+                        '&edit=true'
+                    );
+                  }}
+                >
+                  Configure
+                </Button>
+              </>
+            )}
           </Card>
         </Col>
       );

@@ -5,7 +5,8 @@ import TokenRoles from './tokenRoles';
 import TokenVesting from './tokenVesting';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../../utils/firebase';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
+import TokenContractInterface from '../../../../contract/TokenRegisterContractInterface';
 
 const TokenDisplay = props => {
   const [tokenDetails, setTokenDetails] = useState({});
@@ -15,6 +16,8 @@ const TokenDisplay = props => {
   const [basicDetails, setBasicDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [symbol, setSymbol] = useState('');
+  const [deployLoading, setDeployLoading] = useState(false);
+  const [alreadyDeployedFlag, setAlreadyDeployed] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -30,6 +33,9 @@ const TokenDisplay = props => {
       .then(snapshot => {
         console.log(snapshot.data());
         if (snapshot.data()) {
+          if (snapshot.data().deployed) {
+            setAlreadyDeployed(true);
+          }
           setBasicDetails(snapshot.data().basicDetails);
           setTokenDetails(snapshot.data().TokenType);
           setRoles(snapshot.data().roles);
@@ -42,6 +48,44 @@ const TokenDisplay = props => {
         console.error(err);
       });
   }, []);
+
+  const DeployTokenButton = async () => {
+    setDeployLoading(true);
+    const db = firebase.firestore();
+    let ethereum = window['ethereum'];
+    if (typeof ethereum !== 'undefined') {
+      const wallets = await window['ethereum'].enable();
+      let wallet = await wallets[0];
+      const res = await TokenContractInterface.generateNewSecurityToken(
+        wallet,
+        'name',
+        symbol,
+        JSON.stringify(tokenDetails)
+      );
+      await db
+        .collection('reservedTokenSymbols')
+        .doc(symbol + '-' + localStorage.getItem('uid'))
+        .update({
+          deployed: true,
+          deployAddress: res.transactionHash
+        });
+      setDeployLoading(false);
+      Modal.success({
+        onOk: () => {
+          props.history.push('/issuer/tokens');
+        },
+        content:
+          'Your token was deployed. The ethereum transactionID is ' +
+          res.transactionHash
+      });
+    } else {
+      Modal.error({
+        title: 'Metamask not installed',
+        content: 'Please install metamask'
+      });
+      setDeployLoading(false);
+    }
+  };
 
   console.log('token display');
   return (
@@ -93,8 +137,14 @@ const TokenDisplay = props => {
           <TokenVesting data={vesting} />
           <TokenPhase data={phase} />
           <div style={{ marginTop: '10px' }}>
-            <Button style={{ margin: '10px' }} type='primary'>
-              Deploy
+            <Button
+              style={{ margin: '10px' }}
+              type='primary'
+              onClick={DeployTokenButton}
+              loading={deployLoading}
+              disabled={alreadyDeployedFlag}
+            >
+              {alreadyDeployedFlag ? 'Token is already deployed' : 'Deploy'}
             </Button>
             <Button
               style={{ margin: '10px' }}
@@ -103,6 +153,7 @@ const TokenDisplay = props => {
                   '/issuer/tokenCreation/roles?symbol=' + symbol + '&edit=true'
                 );
               }}
+              disabled={alreadyDeployedFlag}
               type='primary'
             >
               Edit Configuration
