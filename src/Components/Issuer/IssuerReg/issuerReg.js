@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
 import mailer from './mailer';
+import StringValidators from '../../../utils/StringValidators';
 import {
   notification,
   Icon,
@@ -26,7 +27,6 @@ const Registration = props => {
   const cArray = countryArray;
   console.log(cArray);
   const storage = firebase.storage();
-
   const [errFlag, setErrFlag] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState(false);
@@ -37,6 +37,7 @@ const Registration = props => {
   const [boardFlag, setBoardFlag] = useState(false);
   const [zipFlag, setZipFlag] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [taxIDErrFlag, setTaxIDErrFlag] = useState('');
   let [regulationFlag, setregulationFlag] = useState(false);
   const openNotificationWithIcon = (type, message, description) => {
     notification[type]({
@@ -119,7 +120,13 @@ const Registration = props => {
 
   const onChangeHandler = (e, name) => {
     if (name === 'ComapanyName') {
-      setComapanyName(e.target.value);
+      let val = e.target.value;
+      let a = StringValidators.hasNumeric(val, 1);
+      if (a) {
+        return;
+      } else {
+        setComapanyName(val);
+      }
     }
     //images
     else if (name === 'company_reg_uploads') {
@@ -146,11 +153,17 @@ const Registration = props => {
     } else if (name === 'country') {
       setCountry(e);
     } else if (name === 'state') {
-      setStates(e);
+      let val = e.target.value;
+      let a = StringValidators.hasNumeric(val, 1);
+      if (a) {
+        return;
+      } else {
+        setStates(val);
+      }
     } else if (name === 'zipCode') {
       let value = e.target.value;
       console.log(e.target.value);
-      if (value > 9999 && value < 999999) {
+      if (value > 99999 && value < 9999999) {
         setZipFlag(true);
         setErrFlag(true);
       } else {
@@ -160,15 +173,41 @@ const Registration = props => {
     } else if (name === 'date') {
       setDate(e.format('DD-MM-YYYY'));
     } else if (name === 'taxID') {
+      if (country === 'United States') {
+        if (e.target.value > 100000000 && e.target.value < 999999999) {
+          setTaxIDErrFlag('');
+          settaxID(e.target.value);
+        } else {
+          setTaxIDErrFlag('Please enter a valid US Pincode');
+        }
+      }
       settaxID(e.target.value);
     } else if (name === 'date') {
       setDate(e.target.value);
     } else if (name === 'text_area') {
-      settext_area(e.target.value);
+      let val = e.target.value;
+      let a = StringValidators.hasNumeric(val, 1);
+      if (a) {
+        return;
+      } else {
+        settext_area(val);
+      }
     } else if (name === 'text_board') {
-      settext_board(e.target.value);
+      let val = e.target.value;
+      let a = StringValidators.hasNumeric(val, 1);
+      if (a) {
+        return;
+      } else {
+        settext_board(val);
+      }
     } else if (name === 'ComapanyIssue') {
-      setComapanyIssue(e.target.value);
+      let val = e.target.value;
+      let a = StringValidators.hasNumeric(val, 1);
+      if (a) {
+        return;
+      } else {
+        setComapanyIssue(val);
+      }
     } else if (name === 'regulation') {
       setRegulation(e.target.value);
       setregulationFlag(true);
@@ -182,6 +221,7 @@ const Registration = props => {
       setLoading(true);
       console.log(company_reg_uploads, tax_reg_uploads, board_res_uploads);
       if (
+        taxIDErrFlag !== '' ||
         company_reg_uploads === '' ||
         tax_reg_uploads === '' ||
         board_res_uploads === '' ||
@@ -263,18 +303,19 @@ const Registration = props => {
       <div
         style={{
           color: '#186AB4',
-          fontSize: '40px',
-          padding: '2%',
-          width: '80vw',
-          marginLeft: '5%'
+          fontSize: '40px'
         }}
       >
-        <Text>Basic Issuer Information</Text>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {' '}
+          <Text>Basic Issuer Information</Text>
+        </div>
         <br></br>
       </div>{' '}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Form style={{ width: '50vw' }}>
           <Card
+            style={{ borderRadius: '5px' }}
             onClick={() => {
               setInfoFlag(!infoFlag);
             }}
@@ -307,7 +348,7 @@ const Registration = props => {
           </Card>
           <Card hidden={infoFlag}>
             <Card>
-              <Form.Item label={`* Comapany Name Issuing Tokens`}>
+              <Form.Item label={` Company Name Issuing Tokens`}>
                 <Input
                   size='large'
                   id='ComapanyName'
@@ -329,28 +370,26 @@ const Registration = props => {
                   defaultValue='please select a country'
                   style={{ width: '100%' }}
                 >
-                 { cArray.map(
-                   (item)=>{
-                     return (<Option key={item} value={item}>{item}</Option>);
-                    })}
-                 
+                  {cArray.map(item => {
+                    return (
+                      <Option key={item} value={item}>
+                        {item}
+                      </Option>
+                    );
+                  })}
                 </Select>
               </Form.Item>
               <Form.Item label='* Company Registered State'>
-                <Select
+                <Input
                   showSearch
                   id='state'
                   value={state}
                   onChange={e => {
                     onChangeHandler(e, 'state');
                   }}
-                  defaultValue='please select a state'
-                  style={{ width: '100%' }}
-                >
-                  <Option key='TG'>TG</Option>
-                  <Option key='AP'>AP</Option>
-                  <Option key='MP'> MP</Option>
-                </Select>
+                  placeholder='please select a state'
+                  // style={{ width: '100%' }}
+                ></Input>
               </Form.Item>
               <Form.Item label='* Zip Code'>
                 <Input
@@ -388,10 +427,20 @@ const Registration = props => {
                   onChange={e => onChangeHandler(e, 'taxID')}
                   required
                 />
+                <br></br>
+                <Text
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    color: 'red'
+                  }}
+                >
+                  {taxIDErrFlag}
+                </Text>
               </Form.Item>
               Upload Documents ( upload only png files ){' '}
               <Form.Item>
-                <Text>Comapany Registration Document</Text>
+                <Text>Company Registration Document</Text>
                 <br></br>
                 <Input
                   type='file'
@@ -481,6 +530,7 @@ const Registration = props => {
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Form style={{ width: '50vw' }}>
           <Card
+            style={{ borderRadius: '5px' }}
             onClick={() => {
               setInfoFlag2(!infoFlag2);
             }}
@@ -513,7 +563,7 @@ const Registration = props => {
           </Card>
           <Card hidden={infoFlag2}>
             <Card>
-              <Form.Item label={`* Comapany Name Issuing Tokens`}>
+              <Form.Item label={`* Company Name Issuing Tokens`}>
                 <Input
                   value={ComapanyIssue}
                   size='large'
@@ -533,6 +583,7 @@ const Registration = props => {
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Form style={{ width: '50vw' }}>
           <Card
+            style={{ borderRadius: '5px' }}
             onClick={() => {
               setInfoFlag3(!infoFlag3);
             }}
@@ -645,7 +696,7 @@ const Registration = props => {
               }}
             >
               <Text style={{ fontSize: '20px' }}>Issuer Info</Text>
-              <Text>ComapanyName : {ComapanyName}</Text>
+              <Text>CompanyName : {ComapanyName}</Text>
               <Text>Country :{country}</Text>
               <Text>Zip Code : {zipCode}</Text>
               <Text>State :{state}</Text>
@@ -669,7 +720,7 @@ const Registration = props => {
               )}{' '}
               <br></br>
               <Text style={{ fontSize: '20px' }}>ISSUER ADDITIONAL INFO</Text>
-              <Text>Comapny Name Issuing Tokens</Text>
+              <Text>Company Name Issuing Tokens</Text>
               <br></br>
               <Text style={{ fontSize: '20px' }}>LEGAL INFO</Text>
               <Text>Regulation : {Regulation}</Text>
