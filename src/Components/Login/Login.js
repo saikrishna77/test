@@ -52,6 +52,8 @@ const NormalLoginForm = props => {
                     props.history.push('/pendingRegistrationError');
                   } else if (!doc.data().status.basicInfo) {
                     props.history.push('/issuer/issuerReg');
+                  } else if (!doc.data().status.basicInfoApproval) {
+                    props.history.push('/pendingRegistrationError');
                   } else {
                     props.history.push('/issuer/tokens');
                   }
