@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom';
 import AddRoles from './AddRoles/AddRoles';
 
 const TokenConfig = props => {
-  const [current, setCurrent] = React.useState('addroles');
+  const [current, setCurrent] = React.useState('tType');
   const [edit, setEdit] = React.useState(false);
 
   React.useEffect(() => {
