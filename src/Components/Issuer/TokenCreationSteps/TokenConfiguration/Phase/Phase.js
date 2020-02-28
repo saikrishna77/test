@@ -21,7 +21,6 @@ const Phase = props => {
   const [phaseName, setPhaseName] = useState('');
   const [phaseStartDate, setPhaseStartDate] = useState();
   const [phaseEndDate, setPhaseEndDate] = useState();
-  const [editMode, setEditMode] = React.useState(false);
   const [editData, setEditData] = React.useState();
   const [editPhaseNames, setEditPhaseNames] = React.useState();
   const [data, setData] = useState([
@@ -36,8 +35,7 @@ const Phase = props => {
     const search = props.location.search;
     const params = new URLSearchParams(search);
     const symbol = params.get('symbol');
-    if (params.get('edit')) {
-      setEditMode(true);
+    if (props.editMode) {
       firebase.analytics();
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')
@@ -107,7 +105,7 @@ const Phase = props => {
         console.log(symbol);
         firebase.analytics();
         const db = firebase.firestore();
-        if (editMode) {
+        if (props.editMode) {
           db.collection('reservedTokenSymbols')
             .doc(symbol + '-' + localStorage.getItem('uid'))
             .update({
@@ -313,7 +311,7 @@ const Phase = props => {
   return (
     <>
       {setNextModal ? DisplayModal() : null}
-      {editMode ? (
+      {props.editMode ? (
         <>
           <b>Select a phase to edit</b>
           <Select style={{ width: '190px' }} onChange={editPhaseNameChange}>
@@ -365,10 +363,20 @@ const Phase = props => {
             marginTop: '50px'
           }}
         >
+          <Button
+            type='default'
+            style={{ marginRight: '20px' }}
+            onClick={() => {
+              props.setEditMode(true);
+              props.NextTab('addroles');
+            }}
+          >
+            Back
+          </Button>
           <Button type={'primary'} onClick={onSubmit}>
             Submit Phase
           </Button>
-          {editMode ? (
+          {props.editMode ? (
             <Button
               type='primary'
               onClick={() => {

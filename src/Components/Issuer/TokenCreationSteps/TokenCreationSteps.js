@@ -3,7 +3,7 @@ import { Steps, Icon, Card } from 'antd';
 import { withRouter } from 'react-router-dom';
 import TokenConfiguration from './TokenConfiguration/TokenConfiguration';
 import ReserveToken from './ReserveToken/ReserveToken';
-import Roles from './Roles/Roles';
+import Roles from './DefineRoles/DefineRoles';
 
 const { Step } = Steps;
 
@@ -37,7 +37,7 @@ const TokenCreationSteps = props => {
             />
             <Step
               status={stepType === 'roles' || stepType === 'tokenConfig'}
-              title='Add Roles'
+              title='Define Roles'
               // style={{ cursor: 'pointer' }}
               // onClick={() => stepOnClick('roles')}
               icon={<Icon type='solution' />}

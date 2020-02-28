@@ -16,6 +16,11 @@ const TokenRoles = props => {
       key: 'roleType'
     },
     {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email'
+    },
+    {
       title: 'Vesting Schedule',
       dataIndex: 'vesting',
       key: 'vesting'

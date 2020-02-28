@@ -59,6 +59,8 @@ function App(props) {
                     if (doc.data().role === 'issuer') {
                       if (doc.data().status.adminApproved !== 'approved') {
                         props.history.push('/pendingRegistrationError');
+                      } else if (window.location.pathname === '/') {
+                        props.history.push('/issuer/tokens');
                       } else {
                         props.history.push(
                           window.location.pathname + props.location.search
