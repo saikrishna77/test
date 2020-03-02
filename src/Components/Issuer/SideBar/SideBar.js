@@ -118,6 +118,16 @@ const UserSideBar = props => {
             <span className='nav-text'>Issuer Compliance</span>
           </Menu.Item>
           <Menu.Item
+            key='7'
+            onClick={() => {
+              setDefaultMenu(['7']);
+              props.history.push('/issuer/kyc');
+            }}
+          >
+            <Icon type='user' />
+        <span className=' -text'>Kyc Dashboard </span>
+          </Menu.Item>
+          <Menu.Item
             key='6'
             style={{ position: 'absolute', marginTop: '86vh' }}
             onClick={logout}

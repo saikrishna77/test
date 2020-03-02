@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
-import mailer from './mailer';
 import StringValidators from '../../../utils/StringValidators';
 import {
   notification,
@@ -17,15 +16,14 @@ import {
   Radio,
   Modal
 } from 'antd';
-import fs from 'fs';
 import countryArray from '../../../newJSON';
+const ipCon = require('ip');
 const { Option } = Select;
 const { Text } = Typography;
 const { TextArea } = Input;
 
 const Registration = props => {
   const cArray = countryArray;
-  console.log(cArray);
   const storage = firebase.storage();
   const [errFlag, setErrFlag] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,10 +33,12 @@ const Registration = props => {
   const [infoFlag3, setInfoFlag3] = useState(true);
   const [createFlag, setCreateFlag] = useState(false);
   const [boardFlag, setBoardFlag] = useState(false);
-  const [zipFlag, setZipFlag] = useState(false);
   const [saved, setSaved] = useState(false);
   const [taxIDErrFlag, setTaxIDErrFlag] = useState('');
   let [regulationFlag, setregulationFlag] = useState(false);
+  const [lat, setLat] = useState(0);
+  const [lon, setLon] = useState(0);
+  const ip = ipCon.address();
   const openNotificationWithIcon = (type, message, description) => {
     notification[type]({
       message,
@@ -50,7 +50,7 @@ const Registration = props => {
   const [tax_reg_uploads, settax_reg_uploads] = useState('');
   const [board_res_uploads, setboard_res_uploads] = useState('');
   const [sec_filing_doc, setsec_filing_doc] = useState('');
-  //
+
   //inputs
   const [ComapanyName, setComapanyName] = useState('');
   const [zipCode, setzipCode] = useState();
@@ -83,8 +83,13 @@ const Registration = props => {
 
     setvisible(false);
   };
-
+  function getLatLon(position) {
+    setLat(position.coords.latitude);
+    setLon(position.coords.longitude);
+  }
   useEffect(() => {
+    let nac = navigator.geolocation.getCurrentPosition(getLatLon);
+    console.log(nac);
     firebase.auth().onAuthStateChanged(async function(user) {
       if (user) {
         if (user.emailVerified) {
@@ -162,14 +167,7 @@ const Registration = props => {
       }
     } else if (name === 'zipCode') {
       let value = e.target.value;
-      console.log(e.target.value);
-      if (value > 99999 && value < 9999999) {
-        setZipFlag(true);
-        setErrFlag(true);
-      } else {
-        setZipFlag(false);
-      }
-      setzipCode(e.target.value);
+      setzipCode(value);
     } else if (name === 'date') {
       setDate(e.format('DD-MM-YYYY'));
     } else if (name === 'taxID') {
@@ -227,7 +225,7 @@ const Registration = props => {
         board_res_uploads === '' ||
         errFlag === 'true' ||
         radio === '' ||
-        Regulation === '' ||
+        Regulation === undefined ||
         state === '' ||
         country === '' ||
         date === '' ||
@@ -241,6 +239,14 @@ const Registration = props => {
         );
       } else {
         setErrMsg('');
+        const date = new Date();
+        const timestamp = date.getTime();
+        var offset = -date.getTimezoneOffset();
+        const timezone =
+          (offset >= 0 ? '+' : '-') +
+          parseInt(offset / 60) +
+          ':' +
+          (offset % 60);
         const form = {
           companyName: ComapanyName,
           country: country,
@@ -250,29 +256,58 @@ const Registration = props => {
           radio: radio,
           ComapanyIssue: ComapanyIssue,
           Regulation: Regulation,
-          issuer_radio: issuer_radio
+          issuer_radio: issuer_radio,
+          language:
+            (navigator.languages && navigator.languages[0]) ||
+            navigator.language ||
+            navigator.userLanguage,
+          latitude: lat,
+          longitude: lon,
+          ip: ip,
+          timeStamp: timestamp,
+          timeZone: timezone
         };
-        await fileUpload(tax_reg_uploads, form.companyName);
-        await fileUpload(company_reg_uploads, form.companyName);
-        await fileUpload(board_res_uploads, form.companyName);
+        console.log(form);
+        let file1 = await fileUpload(tax_reg_uploads, form.companyName, 'tru');
+
+        let file2 = await fileUpload(
+          company_reg_uploads,
+          form.companyName,
+          'cru'
+        );
+
+        let file3 = await fileUpload(
+          board_res_uploads,
+          form.companyName,
+          'bru'
+        );
+        let file4;
         if (radio === 'upload') {
-          await fileUpload(sec_filing_doc, form.companyName);
+          file4 = await fileUpload(sec_filing_doc, form.companyName, 'sfd');
         } else {
           form.text_area = text_area;
           form.text_board = text_board;
         }
+        form.companyRegistrationUploads = file2;
+        form.boardResolutionUploads = file3;
+        form.taxRegistarionUpload = file1;
+        form.secFilingDoc = file4 ? file4 : '';
         const db = firebase.firestore();
-        console.log(form);
         const ref = db.collection('issuer_register').doc();
         let res = await ref.set({ issuer_data: form });
         console.log(res);
-        mailer();
         openNotificationWithIcon(
           'success',
-          'data has been  saved',
-          `data has been  saved`
+          'data has been saved',
+          `data has been saved`
         );
+
+        const flagUp = db.collection('users').doc(localStorage.getItem('uid'));
+        flagUp.update({ 'status.basicInfo': true }).then(snapshot => {
+          console.log(snapshot);
+        });
         setLoading(false);
+        props.history.push('/issuer/Compliance');
       }
     } catch (e) {
       console.log(e);
@@ -291,11 +326,22 @@ const Registration = props => {
     }, 2000);
   };
 
-  const fileUpload = async (fileName, name) => {
-    const uploadTask = await storage
-      .ref(`/issuer_registration_images/${name}/${fileName.name}`)
-      .put(fileName);
-    console.log(uploadTask);
+  const fileUpload = async (fileName, name, dum) => {
+    return new Promise(async (resolve, reject) => {
+      await storage
+        .ref(`/issuer_registration_images/${name}/${fileName.name}`)
+        .put(fileName);
+      let fireBaseUrl = await storage
+        .ref(`/issuer_registration_images/${name}`)
+        .child(`${fileName.name}`)
+        .getDownloadURL();
+      if (fireBaseUrl === '') {
+        reject();
+      }
+      setTimeout(() => {
+        resolve(fireBaseUrl);
+      }, 1000);
+    });
   };
 
   return (
@@ -313,9 +359,13 @@ const Registration = props => {
         <br></br>
       </div>{' '}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Form style={{ width: '50vw' }}>
+        <Form style={{ width: '50vw', alignItems: 'center' }}>
           <Card
-            style={{ borderRadius: '5px' }}
+            style={{
+              borderRadius: '3px',
+              borderTopColor: '#00008b',
+              borderTopWidth: '3px'
+            }}
             onClick={() => {
               setInfoFlag(!infoFlag);
             }}
@@ -361,10 +411,10 @@ const Registration = props => {
               </Form.Item>
               <Form.Item label='* Company Registered Country'>
                 <Select
-                  showSearch
                   id='country'
                   value={country}
                   onChange={e => {
+                    console.log(e);
                     onChangeHandler(e, 'country');
                   }}
                   defaultValue='please select a country'
@@ -372,8 +422,8 @@ const Registration = props => {
                 >
                   {cArray.map(item => {
                     return (
-                      <Option key={item} value={item}>
-                        {item}
+                      <Option key={item} value={item.name}>
+                        {item.name}
                       </Option>
                     );
                   })}
@@ -400,13 +450,6 @@ const Registration = props => {
                   required
                 ></Input>
                 <br></br>
-                {zipFlag ? (
-                  <Text style={{ color: 'red' }}>
-                    please make sure you enter a valid zipcode
-                  </Text>
-                ) : (
-                  ''
-                )}
               </Form.Item>
               <Form.Item label='* Date of Incorporate'>
                 <DatePicker
@@ -530,7 +573,11 @@ const Registration = props => {
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Form style={{ width: '50vw' }}>
           <Card
-            style={{ borderRadius: '5px' }}
+            style={{
+              borderRadius: '3px',
+              borderTopColor: '#00008b',
+              borderTopWidth: '3px'
+            }}
             onClick={() => {
               setInfoFlag2(!infoFlag2);
             }}
@@ -583,7 +630,11 @@ const Registration = props => {
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Form style={{ width: '50vw' }}>
           <Card
-            style={{ borderRadius: '5px' }}
+            style={{
+              borderRadius: '3px',
+              borderTopColor: '#00008b',
+              borderTopWidth: '3px'
+            }}
             onClick={() => {
               setInfoFlag3(!infoFlag3);
             }}
@@ -617,7 +668,7 @@ const Registration = props => {
           <Card hidden={infoFlag3}>
             <Card>
               <Form.Item>
-                <Text>Regulation</Text>
+                <Text>*Regulation</Text>
                 <Row>
                   <Radio.Group onChange={e => onChangeHandler(e, 'regulation')}>
                     <Radio value={'Regulation-D'}>Regulation-D</Radio>

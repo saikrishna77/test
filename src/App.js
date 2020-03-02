@@ -16,6 +16,7 @@ import IssuerReg from './Components/Issuer/IssuerReg/issuerReg';
 import ComplianceForm from './Components/Compliance/ComplianceForm';
 import TokenDeploy from './Components/Issuer/TokenCreationSteps/tokenDeploy';
 import Web3 from 'web3';
+import KYC_DashBoard from './Components/Compliance/KYC_DashBoard';
 
 function App(props) {
   React.useEffect(() => {
@@ -190,6 +191,17 @@ function App(props) {
               <IssuerSideBar />
               <div style={{ marginTop: '6%', marginLeft: '10%' }}>
                 <ComplianceForm />
+              </div>
+            </>
+          )}
+        ></Route>
+        <Route
+          path='/issuer/kyc'
+          render={props => (
+            <>
+              <IssuerSideBar />
+              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+                <KYC_DashBoard />
               </div>
             </>
           )}
