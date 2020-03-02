@@ -34,7 +34,7 @@ class TokenType extends React.Component {
     const params = new URLSearchParams(search);
     const symbol = params.get('symbol');
     this.setState({ symbol: symbol });
-    if (params.get('edit')) {
+    if (this.props.editMode) {
       firebase.analytics();
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')

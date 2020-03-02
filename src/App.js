@@ -60,6 +60,12 @@ function App(props) {
                     if (doc.data().role === 'issuer') {
                       if (doc.data().status.adminApproved !== 'approved') {
                         props.history.push('/pendingRegistrationError');
+                      } else if (!doc.data().status.basicInfo) {
+                        props.history.push('/issuer/issuerReg');
+                      } else if (!doc.data().status.basicInfoApproval) {
+                        props.history.push('/pendingRegistrationError');
+                      } else if (window.location.pathname === '/') {
+                        props.history.push('/issuer/tokens');
                       } else {
                         props.history.push(
                           window.location.pathname + props.location.search
@@ -177,8 +183,7 @@ function App(props) {
           path='/issuer/issuerReg'
           render={props => (
             <>
-              <IssuerSideBar />
-              <div style={{ marginTop: '6%', marginLeft: '10%' }}>
+              <div style={{ margin: 'auto' }}>
                 <IssuerReg />
               </div>
             </>

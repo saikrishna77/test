@@ -796,6 +796,14 @@ const Registration = props => {
           Submit
         </Button>
       </div>
+      <Button
+        onClick={() => {
+          firebase.auth().signOut();
+          props.history.push('/login');
+        }}
+      >
+        Logout
+      </Button>
     </>
   );
 };

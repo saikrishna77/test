@@ -5,26 +5,25 @@ import { Row, Icon } from 'antd';
 import Vesting from './Vesting/Vesting';
 import Phase from './Phase/Phase';
 import { withRouter } from 'react-router-dom';
+import AddRoles from './AddRoles/AddRoles';
 
 const TokenConfig = props => {
   const [current, setCurrent] = React.useState('tType');
-  const [firebaseTokenID, setFirebaseTokenID] = React.useState();
+  const [edit, setEdit] = React.useState(false);
+
   React.useEffect(() => {
     const search = props.location.search;
     const params = new URLSearchParams(search);
-    if (params.get('doneVesting')) {
-      setCurrent('phase');
+    if (params.get('edit')) {
+      setEdit(true);
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
   };
-  const handleNextClick = (next, tokenID = null) => {
-    if (tokenID) {
-      setFirebaseTokenID(tokenID);
-    }
-    console.log('called');
+  const handleNextClick = next => {
     setCurrent(next);
   };
   return (
@@ -36,6 +35,10 @@ const TokenConfig = props => {
         </Menu.Item>
         <Menu.Item key='vesting' disabled={current !== 'vesting'}>
           Vesting Schedule & lock period &nbsp;
+          <Icon type='right' />
+        </Menu.Item>
+        <Menu.Item key='addroles' disabled={current !== 'addroles'}>
+          Add Roles &nbsp;
           <Icon type='right' />
         </Menu.Item>
         <Menu.Item key='phase' disabled={current !== 'phase'}>
@@ -57,20 +60,37 @@ const TokenConfig = props => {
             Investors
           </b>
           <div style={{ paddingLeft: '20%', paddingTop: '3%' }}>
-            <TokenType NextTab={handleNextClick} />
+            <TokenType NextTab={handleNextClick} editMode={edit} />
           </div>
         </Row>
       ) : current === 'vesting' ? (
         <Row justify='center' style={{ paddingTop: '2%' }}>
           <b>Vesting Schedule</b>
           <div style={{ marginTop: '1%' }}>
-            <Vesting NextTab={handleNextClick} TokenID={firebaseTokenID} />
+            <Vesting
+              NextTab={handleNextClick}
+              editMode={edit}
+              setEditMode={setEdit}
+            />
           </div>
         </Row>
+      ) : current === 'addroles' ? (
+        <div>
+          <b>Add Roles</b>
+          <AddRoles
+            NextTab={handleNextClick}
+            editMode={edit}
+            setEditMode={setEdit}
+          />
+        </div>
       ) : current === 'phase' ? (
         <div>
           <b>Phase</b>
-          <Phase NextTab={handleNextClick} TokenID={firebaseTokenID} />
+          <Phase
+            NextTab={handleNextClick}
+            editMode={edit}
+            setEditMode={setEdit}
+          />
         </div>
       ) : current === 'dividend' ? (
         <div>Dividend Yet to be built</div>

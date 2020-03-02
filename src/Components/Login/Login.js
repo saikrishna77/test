@@ -50,10 +50,16 @@ const NormalLoginForm = props => {
                 if (doc.data().role === 'issuer') {
                   if (doc.data().status.adminApproved !== 'approved') {
                     props.history.push('/pendingRegistrationError');
+                  } else if (!doc.data().status.basicInfo) {
+                    props.history.push('/issuer/issuerReg');
+                  } else if (!doc.data().status.basicInfoApproval) {
+                    props.history.push('/pendingRegistrationError');
                   } else {
                     props.history.push('/issuer/tokens');
                   }
-                } else {
+                }
+                // /issuer/issuerReg
+                else {
                   props.history.push('/admin/issuerSuperAdmins');
                 }
                 console.log('Document data:', doc.data());

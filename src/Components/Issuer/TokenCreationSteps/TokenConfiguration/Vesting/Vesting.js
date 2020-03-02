@@ -18,7 +18,6 @@ import firebase from '../../../../../utils/firebase';
 import { withRouter } from 'react-router-dom';
 
 const Vesting = props => {
-  // console.log(props.TokenID);
   const [data, setData] = React.useState([]);
   const [setError, setSetError] = React.useState(false);
   const [vestingName, setVestingName] = React.useState();
@@ -29,7 +28,6 @@ const Vesting = props => {
   const [setNextModal, setSetNextModal] = React.useState(false);
   const [scheduleNames, setScheduleNames] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
-  const [editMode, setEditMode] = React.useState(false);
   const [editVestingNames, setEditVestingNames] = React.useState([]);
   const [editData, setEditData] = React.useState();
 
@@ -37,8 +35,7 @@ const Vesting = props => {
     const search = props.location.search;
     const params = new URLSearchParams(search);
     const symbol = params.get('symbol');
-    if (params.get('edit')) {
-      setEditMode(true);
+    if (props.editMode) {
       firebase.analytics();
       const db = firebase.firestore();
       db.collection('reservedTokenSymbols')
@@ -279,12 +276,15 @@ const Vesting = props => {
               placement: 'topRight'
             });
             setLoading(false);
-            if (editMode) {
-              props.NextTab('phase');
-            } else {
-              window.location.href =
-                '/issuer/tokenCreation/roles?symbol=' + symbol + '&setVesting=true';
-            }
+            props.NextTab('addroles');
+            // if (editMode) {
+            //   props.NextTab('phase');
+            // } else {
+            //   window.location.href =
+            //     '/issuer/tokenCreation/roles?symbol=' +
+            //     symbol +
+            //     '&setVesting=true';
+            // }
           })
           .catch(err => {
             notification.error({
@@ -306,7 +306,7 @@ const Vesting = props => {
         console.log(symbol);
         firebase.analytics();
         const db = firebase.firestore();
-        if (editMode) {
+        if (props.editMode) {
           db.collection('reservedTokenSymbols')
             .doc(symbol + '-' + localStorage.getItem('uid'))
             .update({
@@ -323,7 +323,7 @@ const Vesting = props => {
                 placement: 'topRight'
               });
               setLoading(false);
-              props.NextTab('phase');
+              props.NextTab('addroles');
             })
             .catch(err => {
               notification.error({
@@ -513,14 +513,14 @@ const Vesting = props => {
   };
 
   const handleNextPhase = () => {
-    props.NextTab('phase');
+    props.NextTab('addroles');
   };
 
   return (
     <div>
       {setError ? DisplayError() : null}
       {setNextModal ? DisplaySuccess() : null}
-      {editMode ? (
+      {props.editMode ? (
         <>
           <b>Select a vesting to edit</b>
           <Select style={{ width: '190px' }} onChange={editVestingNameChange}>
@@ -596,10 +596,20 @@ const Vesting = props => {
           <b>Total Percent Vesting: {displayVesting}%</b>
         </div>
         <div style={{ textAlign: 'right' }}>
+          <Button
+            type='default'
+            style={{ marginRight: '20px' }}
+            onClick={() => {
+              props.setEditMode(true);
+              props.NextTab('tType');
+            }}
+          >
+            Back
+          </Button>
           <Button type='primary' onClick={onSubmit} loading={loading}>
             Save the Vesting Schedule
           </Button>
-          {scheduleNames.length > 0 || editMode ? (
+          {scheduleNames.length > 0 || props.editMode ? (
             <Button
               type='primary'
               onClick={handleNextPhase}

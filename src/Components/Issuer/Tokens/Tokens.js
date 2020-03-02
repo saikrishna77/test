@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import firebase from '../../../utils/firebase';
 import { Card, Row, Col, Button, Empty, Spin } from 'antd';
 import Countdown from 'react-countdown';
-import TokenContractInterface from '../../../contract/TokenRegisterContractInterface';
+// import TokenContractInterface from '../../../contract/TokenRegisterContractInterface';
 
 const Tokens = props => {
   const [data, setData] = React.useState([]);
